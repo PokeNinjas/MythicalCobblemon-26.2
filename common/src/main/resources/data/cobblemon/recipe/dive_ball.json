@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " t ",
+        "lcr",
+        " b "
+    ],
+    "key": {
+        "t": "cobblemon:white_apricorn",
+        "l": "cobblemon:blue_apricorn",
+        "c": "#cobblemon:tier_2_poke_ball_materials",
+        "r": "cobblemon:blue_apricorn",
+        "b": "cobblemon:blue_apricorn"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:dive_ball"
+    }
+}

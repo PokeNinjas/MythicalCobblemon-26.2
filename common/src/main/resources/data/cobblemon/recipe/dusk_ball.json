@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " t ",
+        "lcr",
+        " b "
+    ],
+    "key": {
+        "t": "cobblemon:green_apricorn",
+        "l": "cobblemon:black_apricorn",
+        "c": "#cobblemon:tier_3_poke_ball_materials",
+        "r": "cobblemon:black_apricorn",
+        "b": "cobblemon:green_apricorn"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:dusk_ball"
+    }
+}

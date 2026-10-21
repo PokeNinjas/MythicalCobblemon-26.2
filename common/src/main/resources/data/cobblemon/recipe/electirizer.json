@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GIG",
+        "IRI",
+        "GIG"
+    ],
+    "key": {
+        "G": "#c:ingots/gold",
+        "I": "#c:ingots/iron",
+        "R": "minecraft:redstone_block"
+    },
+    "result": {
+        "id": "cobblemon:electirizer"
+    }
+}

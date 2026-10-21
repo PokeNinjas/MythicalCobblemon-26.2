@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "cobblemon:hearty_grain_bale"
+  ],
+  "result": {
+    "count": 9,
+    "id": "cobblemon:hearty_grains"
+  }
+}

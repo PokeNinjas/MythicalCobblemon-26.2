@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "cobblemon:vivichoke"
+    ],
+    "result": {
+        "count": 1,
+        "id": "cobblemon:vivichoke_seeds"
+    }
+}

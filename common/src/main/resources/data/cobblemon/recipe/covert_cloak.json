@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " W ",
+        "WPW",
+        "WGW"
+    ],
+    "key": {
+        "G": "minecraft:golden_carrot",
+        "W": "#minecraft:wool",
+        "P": "minecraft:phantom_membrane"
+    },
+    "result": {
+        "id": "cobblemon:covert_cloak"
+    }
+}

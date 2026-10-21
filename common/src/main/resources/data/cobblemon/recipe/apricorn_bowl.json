@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "misc",
+    "key": {
+        "#": "#cobblemon:apricorns"
+    },
+    "pattern": [
+        "# #",
+        " # "
+    ],
+    "result": {
+        "count": 3,
+        "id": "minecraft:bowl"
+    }
+}

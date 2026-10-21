@@ -1,0 +1,13 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "TS"
+    ],
+    "key": {
+        "T": "minecraft:target",
+        "S": "#minecraft:wooden_slabs"
+    },
+    "result": {
+        "id": "cobblemon:ring_target"
+    }
+}

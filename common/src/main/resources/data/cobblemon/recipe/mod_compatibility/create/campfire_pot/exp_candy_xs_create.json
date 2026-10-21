@@ -1,0 +1,27 @@
+{
+    "fabric:load_conditions": [
+        {
+            "condition": "fabric:all_mods_loaded",
+            "values": [
+                "create"
+            ]
+        }
+    ],
+    "neoforge:conditions": [
+        {
+            "type": "neoforge:mod_loaded",
+            "modid": "create"
+        }
+    ],
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "medicines",
+    "ingredients": [
+        "create:experience_nugget",
+        "minecraft:honeycomb"
+    ],
+    "result": {
+        "id": "cobblemon:exp_candy_xs"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

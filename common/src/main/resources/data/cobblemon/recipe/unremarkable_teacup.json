@@ -1,0 +1,14 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "C C",
+        "QCQ"
+    ],
+    "key": {
+        "Q": "#c:gems/quartz",
+        "C": "minecraft:clay_ball"
+    },
+    "result": {
+        "id": "cobblemon:unremarkable_teacup"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "type": "cobblemon:brewing_stand",
+    "input": "cobblemon:tamato_berry",
+    "bottle": "cobblemon:pp_up",
+    "result": {
+        "id": "cobblemon:carbos"
+    }
+}

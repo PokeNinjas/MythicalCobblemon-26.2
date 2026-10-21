@@ -1,0 +1,419 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.client.render
+
+import com.cobblemon.mod.common.api.gui.drawText
+import com.cobblemon.mod.common.api.gui.drawTextJustifiedRight
+import com.cobblemon.mod.common.api.text.font
+import com.cobblemon.mod.common.client.CobblemonResources
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.math.Axis
+import net.minecraft.util.Util
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.renderer.rendertype.RenderTypes
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.resources.Identifier
+import net.minecraft.util.FormattedCharSequence
+import net.minecraft.util.Mth
+import net.minecraft.world.item.ItemStack
+import kotlin.math.cos
+import kotlin.math.sin
+
+fun renderScaledGuiItemIcon(context: GuiGraphicsExtractor, itemStack: ItemStack, x: Double, y: Double,
+                            scale: Double = 1.0, zTranslation: Float = 100.0F) {
+    if (itemStack.isEmpty) return
+    require(scale.isFinite() && scale > 0.0) { "GUI item scale must be finite and positive" }
+    if (zTranslation > 0F) context.nextStratum()
+    val poses = context.pose()
+    poses.pushMatrix()
+    try {
+        poses.translate(x.toFloat(), y.toFloat())
+        poses.scale(scale.toFloat(), scale.toFloat())
+        context.item(itemStack, 0, 0)
+    } finally {
+        poses.popMatrix()
+    }
+}
+
+fun getDepletableRedGreen(
+    ratio: Float,
+    yellowRatio: Float = 0.5F,
+    redRatio: Float = 0.2F
+): Pair<Float, Float> {
+    val m = -2
+
+    val r = if (ratio > redRatio) {
+        m * ratio - m
+    } else {
+        1.0
+    }
+
+    val g = if (ratio > yellowRatio) {
+        1.0
+    } else if (ratio > redRatio) {
+        ratio * 1 / yellowRatio
+    } else {
+        0.0
+    }
+
+    return r.toFloat() to g.toFloat()
+}
+
+fun drawScrollingText(
+    context: GuiGraphicsExtractor,
+    font: Font,
+    text: Component,
+    minX: Int,
+    minY: Int,
+    maxX: Int,
+    maxY: Int,
+    colour: Int,
+    minScrollVelocity: Double? = 10.0
+) {
+    val textWidth = font.width(text)
+    val fittedMaxX = if (textWidth <= maxX - minX) minX + textWidth else maxX
+    renderScrollingString(context, font, text, minX, minY, fittedMaxX, maxY, colour, minScrollVelocity)
+}
+
+/** Copied from [net.minecraft.client.gui.components.AbstractWidget.renderScrollingString] **/
+fun renderScrollingString(
+    context: GuiGraphicsExtractor,
+    font: Font,
+    text: Component,
+    minX: Int,
+    minY: Int,
+    maxX: Int,
+    maxY: Int,
+    colour: Int,
+    minScrollVelocity: Double? = 10.0
+) {
+    val textWidth = font.width(text)
+    val centerY = (minY + maxY - 9) / 2 + 1
+    val boxWidth = maxX - minX
+    if (textWidth <= boxWidth) {
+        val centerX = Mth.clamp((minX + maxX) / 2, minX + textWidth / 2, maxX - textWidth / 2)
+        context.centeredText(font, text, centerX, centerY, colour)
+        return
+    }
+
+    val overflow = textWidth - boxWidth
+    var period = (overflow * 0.5).coerceAtLeast(3.0)
+    if (minScrollVelocity != null) {
+        period = period.coerceAtMost(2 * overflow / minScrollVelocity)
+    }
+    val time = Util.getMillis() / 1000.0
+    val easedProgress = sin((Math.PI / 2) * cos(2 * Math.PI * time / period)) / 2.0 + 0.5
+    val offset = Mth.lerp(easedProgress, 0.0, overflow.toDouble())
+    context.enableScissor(minX, minY, maxX, maxY)
+    context.text(font, text, minX - offset.toInt(), centerY, colour)
+    context.disableScissor()
+}
+
+fun drawScaledText(
+    context: GuiGraphicsExtractor,
+    font: Identifier? = null,
+    text: MutableComponent,
+    x: Number,
+    y: Number,
+    scale: Float = 1F,
+    opacity: Number = 1F,
+    maxCharacterWidth: Int = Int.MAX_VALUE,
+    colour: Int = 0x00FFFFFF + ((opacity.toFloat() * 255).toInt() shl 24),
+    centered: Boolean = false,
+    shadow: Boolean = false,
+    pMouseX: Int? = null,
+    pMouseY: Int? = null
+) {
+    if (opacity.toFloat() < 0.05F) {
+        return
+    }
+
+    val textWidth = Minecraft.getInstance().font.width(if (font != null) text.font(font) else text)
+    val extraScale = if (textWidth < maxCharacterWidth) 1F else (maxCharacterWidth / textWidth.toFloat())
+    val fontHeight = if (font == null) 5F else 6F
+    val matrices = context.pose()
+    matrices.pushMatrix()
+    matrices.scale((scale * extraScale).toFloat(), (scale * extraScale).toFloat())
+    val isHovered = drawText(
+        context = context,
+        font = font,
+        text = text,
+        x = x.toFloat() / (scale * extraScale),
+        y = y.toFloat() / (scale * extraScale) + (1F - extraScale) * fontHeight * scale,
+        centered = centered,
+        colour = colour,
+        shadow = shadow,
+        pMouseX = pMouseX?.toFloat()?.div((scale * extraScale)),
+        pMouseY = pMouseY?.toFloat()?.div(scale * extraScale)?.plus((1F - extraScale) * fontHeight * scale)
+    )
+    matrices.popMatrix()
+    // Draw tooltip that was created with onHover and is attached to the MutableComponent
+    if (isHovered) {
+        val minecraft = Minecraft.getInstance()
+        when (val hover = text.style.hoverEvent) {
+            is net.minecraft.network.chat.HoverEvent.ShowText -> context.setTooltipForNextFrame(minecraft.font,
+                minecraft.font.split(hover.value(), maxOf(context.guiWidth() / 2, 200)), pMouseX!!, pMouseY!!)
+            is net.minecraft.network.chat.HoverEvent.ShowItem -> context.setTooltipForNextFrame(minecraft.font, hover.item().create(), pMouseX!!, pMouseY!!)
+            is net.minecraft.network.chat.HoverEvent.ShowEntity -> if (minecraft.options.advancedItemTooltips) {
+                context.setComponentTooltipForNextFrame(minecraft.font, hover.entity().tooltipLines, pMouseX!!, pMouseY!!)
+            }
+            else -> Unit
+        }
+    }
+}
+
+fun drawScaledText(
+    context: GuiGraphicsExtractor,
+    text: FormattedCharSequence,
+    x: Number,
+    y: Number,
+    scaleX: Float = 1F,
+    scaleY: Float = 1F,
+    opacity: Number = 1F,
+    colour: Int = 0x00FFFFFF + ((opacity.toFloat() * 255).toInt() shl 24),
+    centered: Boolean = false,
+    shadow: Boolean = false
+) {
+    if (opacity.toFloat() < 0.05F) {
+        return
+    }
+    val matrixStack = context.pose()
+    matrixStack.pushMatrix()
+    matrixStack.scale((scaleX).toFloat(), (scaleY).toFloat())
+    drawText(
+        context = context,
+        text = text,
+        x = x.toFloat() / scaleX,
+        y = y.toFloat() / scaleY,
+        centered = centered,
+        colour = colour,
+        shadow = shadow
+    )
+    matrixStack.popMatrix()
+}
+
+fun drawScaledTextJustifiedRight(
+    context: GuiGraphicsExtractor,
+    font: Identifier? = null,
+    text: MutableComponent,
+    x: Number,
+    y: Number,
+    scale: Float = 1F,
+    opacity: Number = 1F,
+    maxCharacterWidth: Int = Int.MAX_VALUE,
+    colour: Int = 0x00FFFFFF + ((opacity.toFloat() * 255).toInt() shl 24),
+    shadow: Boolean = false
+) {
+    if (opacity.toFloat() < 0.05F) {
+        return
+    }
+    val textWidth = Minecraft.getInstance().font.width(if (font != null) text.font(font) else text)
+    val extraScale = if (textWidth < maxCharacterWidth) 1F else (maxCharacterWidth / textWidth.toFloat())
+    val fontHeight = if (font == null) 5F else 6F
+    val matrixStack = context.pose()
+    matrixStack.pushMatrix()
+    matrixStack.scale((scale * extraScale).toFloat(), (scale * extraScale).toFloat())
+    drawTextJustifiedRight(
+        context = context,
+        font = font,
+        text = text,
+        x = x.toFloat() / (scale * extraScale),
+        y = y.toFloat() / (scale * extraScale) + (1F - extraScale) * fontHeight * scale,
+        colour = colour,
+        shadow = shadow
+    )
+    matrixStack.popMatrix()
+}
+
+fun drawScaledTextJustifiedRight(
+    context: GuiGraphicsExtractor,
+    text: MutableComponent,
+    x: Number,
+    y: Number,
+    scaleX: Float = 1F,
+    scaleY: Float = 1F,
+    opacity: Number = 1F,
+    colour: Int = 0x00FFFFFF + ((opacity.toFloat() * 255).toInt() shl 24),
+    shadow: Boolean = false
+) {
+    if (opacity.toFloat() < 0.05F) {
+        return
+    }
+    val matrixStack = context.pose()
+    matrixStack.pushMatrix()
+    matrixStack.scale((scaleX).toFloat(), (scaleY).toFloat())
+    drawTextJustifiedRight(
+        context = context,
+        text = text,
+        x = x.toFloat() / scaleX,
+        y = y.toFloat() / scaleY,
+        colour = colour,
+        shadow = shadow
+    )
+    matrixStack.popMatrix()
+}
+
+fun renderBeaconBeam(
+    matrixStack: PoseStack,
+    collector: net.minecraft.client.renderer.SubmitNodeCollector,
+    textureLocation: Identifier = CobblemonResources.PHASE_BEAM,
+    partialTicks: Float,
+    totalLevelTime: Long,
+    yOffset: Float = 0F,
+    height: Float,
+    red: Float,
+    green: Float,
+    blue: Float,
+    alpha: Float,
+    beamRadius: Float,
+    glowRadius: Float,
+    glowAlpha: Float
+) {
+    val top = yOffset + height
+    val rotation = Math.floorMod(totalLevelTime, 40).toFloat() + partialTicks
+    matrixStack.pushPose()
+    matrixStack.mulPose(Axis.YP.rotationDegrees(rotation * 2.25F - 45F))
+    collector.submitCustomGeometry(matrixStack, RenderTypes.beaconBeam(textureLocation, false)) { pose, buffer ->
+        val captured = PoseStack(); captured.last().set(pose)
+        renderPart(captured, buffer, red, green, blue, alpha, yOffset, top,
+            0F, beamRadius, beamRadius, 0F, -beamRadius, 0F, 0F, -beamRadius)
+    }
+    matrixStack.popPose()
+    collector.submitCustomGeometry(matrixStack, RenderTypes.beaconBeam(textureLocation, true)) { pose, buffer ->
+        val captured = PoseStack(); captured.last().set(pose)
+        renderPart(captured, buffer, red, green, blue, glowAlpha, yOffset, top,
+            -glowRadius, -glowRadius, glowRadius, -glowRadius, -glowRadius, glowRadius, glowRadius, glowRadius)
+    }
+}
+
+fun renderPart(
+    matrixStack: PoseStack,
+    vertexBuffer: VertexConsumer,
+    red: Float,
+    green: Float,
+    blue: Float,
+    alpha: Float,
+    yMin: Float,
+    yMax: Float,
+    p_112164_: Float,
+    p_112165_: Float,
+    p_112166_: Float,
+    p_112167_: Float,
+    p_112168_: Float,
+    p_112169_: Float,
+    p_112170_: Float,
+    p_112171_: Float
+) {
+    val pose = matrixStack.last()
+    val matrix4f = pose.pose()
+    val matrix3f = pose.normal()
+    renderQuad(
+        pose,
+        vertexBuffer,
+        red,
+        green,
+        blue,
+        alpha,
+        yMin,
+        yMax,
+        p_112164_,
+        p_112165_,
+        p_112166_,
+        p_112167_
+    )
+    renderQuad(
+        pose,
+        vertexBuffer,
+        red,
+        green,
+        blue,
+        alpha,
+        yMin,
+        yMax,
+        p_112170_,
+        p_112171_,
+        p_112168_,
+        p_112169_
+    )
+    renderQuad(
+        pose,
+        vertexBuffer,
+        red,
+        green,
+        blue,
+        alpha,
+        yMin,
+        yMax,
+        p_112166_,
+        p_112167_,
+        p_112170_,
+        p_112171_
+    )
+    renderQuad(
+        pose,
+        vertexBuffer,
+        red,
+        green,
+        blue,
+        alpha,
+        yMin,
+        yMax,
+        p_112168_,
+        p_112169_,
+        p_112164_,
+        p_112165_
+    )
+}
+
+fun renderQuad(
+    matrixEntry: PoseStack.Pose,
+    buffer: VertexConsumer,
+    red: Float,
+    green: Float,
+    blue: Float,
+    alpha: Float,
+    yMin: Float,
+    yMax: Float,
+    x1: Float,
+    z1: Float,
+    x2: Float,
+    z2: Float
+) {
+    addVertex(matrixEntry, buffer, red, green, blue, alpha, yMax, x1, z1, 1F, 0F)
+    addVertex(matrixEntry, buffer, red, green, blue, alpha, yMin, x1, z1, 1F, 1F)
+    addVertex(matrixEntry, buffer, red, green, blue, alpha, yMin, x2, z2, 0F, 1F)
+    addVertex(matrixEntry, buffer, red, green, blue, alpha, yMax, x2, z2, 0F, 0F)
+}
+
+fun addVertex(
+    matrixEntry: PoseStack.Pose,
+    buffer: VertexConsumer,
+    red: Float,
+    green: Float,
+    blue: Float,
+    alpha: Float,
+    y: Float,
+    x: Float,
+    z: Float,
+    texU: Float,
+    texV: Float
+) {
+    buffer
+        .addVertex(matrixEntry.pose(), x, y, z)
+        .setColor(red, green, blue, alpha)
+        .setUv(texU, texV)
+        .setOverlay(OverlayTexture.NO_OVERLAY)
+        .setLight(15728880)
+        .setNormal(matrixEntry, 0.0f, 1.0f, 0.0f)
+}

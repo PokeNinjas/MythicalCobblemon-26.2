@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " t ",
+        "lcr",
+        " b "
+    ],
+    "key": {
+        "t": "cobblemon:yellow_apricorn",
+        "l": "cobblemon:green_apricorn",
+        "c": "#cobblemon:tier_2_poke_ball_materials",
+        "r": "cobblemon:green_apricorn",
+        "b": "cobblemon:red_apricorn"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:friend_ball"
+    }
+}

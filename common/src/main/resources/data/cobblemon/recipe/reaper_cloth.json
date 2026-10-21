@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " W ",
+        "PGP",
+        "WPW"
+    ],
+    "key": {
+        "P": "minecraft:phantom_membrane",
+        "W": "#minecraft:wool",
+        "G": "minecraft:ghast_tear"
+    },
+    "result": {
+        "id": "cobblemon:reaper_cloth"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "SOS",
+        "OCO",
+        "IOI"
+    ],
+    "key": {
+        "S": "#c:slime_balls",
+        "O": "minecraft:obsidian",
+        "C": "minecraft:rabbit_foot",
+        "I": "cobblemon:iron_ball"
+    },
+    "result": {
+        "id": "cobblemon:loaded_dice"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "building",
+    "key": {
+        "#": "cobblemon:polished_tumblestone_slab"
+    },
+    "pattern": [
+        "#",
+        "#"
+    ],
+    "result": {
+        "count": 1,
+        "id": "cobblemon:chiseled_polished_tumblestone"
+    }
+}

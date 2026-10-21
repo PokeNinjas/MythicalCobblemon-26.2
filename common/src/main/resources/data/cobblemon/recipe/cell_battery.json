@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "cell_battery",
+  "pattern": [
+    " I",
+    " R",
+    " C"
+  ],
+  "key": {
+    "C": "#c:ingots/copper",
+    "R": "#cobblemon:cell_battery_charge_ingredients",
+    "I": "#c:ingots/iron"
+  },
+  "result": {
+    "id": "cobblemon:cell_battery"
+  }
+}

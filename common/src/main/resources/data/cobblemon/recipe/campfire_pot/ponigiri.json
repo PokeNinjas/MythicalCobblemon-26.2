@@ -1,0 +1,20 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "complex_dishes",
+    "ingredients": [
+        "cobblemon:hearty_grains",
+        "cobblemon:hearty_grains",
+        "cobblemon:hearty_grains",
+        "minecraft:dried_kelp"
+    ],
+    "result": {
+        "id": "cobblemon:ponigiri",
+        "count": 3
+    },
+    "seasoningTag": "cobblemon:recipe_filters/nutrition_seasoning",
+    "seasoningProcessors": [
+        "ingredient",
+        "food_colour",
+        "food"
+    ]
+}

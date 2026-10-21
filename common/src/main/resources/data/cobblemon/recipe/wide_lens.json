@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+      "IA",
+      "CI",
+      "C "
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "C": "#c:ingots/copper",
+        "A": "#c:gems/amethyst"
+    },
+    "result": {
+        "id": "cobblemon:wide_lens"
+    }
+}

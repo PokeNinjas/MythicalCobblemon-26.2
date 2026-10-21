@@ -1,0 +1,13 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "minecraft:feather",
+        "minecraft:feather",
+        "minecraft:feather",
+        "cobblemon:white_mint_leaf"
+    ],
+    "result": {
+        "id": "cobblemon:health_feather",
+        "count": 3
+    }
+}

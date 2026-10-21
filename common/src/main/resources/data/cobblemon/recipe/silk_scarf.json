@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " WS",
+        "SGW",
+        "WS "
+    ],
+    "key": {
+        "W": "#minecraft:wool",
+        "S": "#c:strings",
+        "G": "cobblemon:normal_gem"
+    },
+    "result": {
+        "id": "cobblemon:silk_scarf"
+    }
+}

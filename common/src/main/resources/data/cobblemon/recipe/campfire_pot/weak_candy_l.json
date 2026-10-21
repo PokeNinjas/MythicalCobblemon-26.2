@@ -1,0 +1,20 @@
+{
+    "type": "cobblemon:cooking_pot",
+    "group": "iv_candy_bad",
+    "category": "misc",
+    "key": {
+        "K": "cobblemon:kelpsy_berry",
+        "B": "cobblemon:enigma_berry",
+        "E": "cobblemon:exp_candy_l"
+    },
+    "pattern": [
+        "KBK",
+        "BEB",
+        "KBK"
+    ],
+    "result": {
+        "id": "cobblemon:weak_candy"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

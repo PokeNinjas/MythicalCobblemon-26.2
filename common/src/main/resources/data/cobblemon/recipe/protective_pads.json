@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "WW ",
+        "WHI",
+		" IW"
+    ],
+    "key": {
+        "W": "#minecraft:wool",
+        "I": "#c:ingots/iron",
+        "H": "minecraft:rabbit_hide"
+    },
+    "result": {
+        "id": "cobblemon:protective_pads"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:smelting",
+    "group": "dusk_stone",
+    "ingredient": "cobblemon:dusk_stone_ore",
+    "result": {
+        "id": "cobblemon:dusk_stone"
+    },
+    "experience": 0.2,
+    "cookingtime": 200
+}

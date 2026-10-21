@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "group": "basic_ancient_balls",
+    "pattern": [
+        " t ",
+        "lcr",
+        " b "
+    ],
+    "key": {
+        "t": "cobblemon:yellow_apricorn",
+        "l": "cobblemon:tumblestone",
+        "c": "#cobblemon:tier_1_poke_ball_materials",
+        "r": "cobblemon:tumblestone",
+        "b": "cobblemon:yellow_apricorn"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:ancient_citrine_ball"
+    }
+}

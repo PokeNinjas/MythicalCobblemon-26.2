@@ -1,0 +1,17 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "group": "x_items",
+    "category": "misc",
+    "ingredients": [
+        "minecraft:glass_bottle",
+        "cobblemon:pep_up_flower",
+        "minecraft:bone_meal",
+        "cobblemon:liechi_berry"
+    ],
+    "result": {
+        "id": "cobblemon:x_attack",
+        "count": 4
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

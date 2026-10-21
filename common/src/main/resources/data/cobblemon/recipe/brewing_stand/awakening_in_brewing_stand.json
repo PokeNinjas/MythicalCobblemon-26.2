@@ -1,0 +1,8 @@
+{
+    "type": "cobblemon:brewing_stand",
+    "input": "cobblemon:chesto_berry",
+    "bottle": "minecraft:glass_bottle",
+    "result": {
+        "id": "cobblemon:awakening"
+    }
+}

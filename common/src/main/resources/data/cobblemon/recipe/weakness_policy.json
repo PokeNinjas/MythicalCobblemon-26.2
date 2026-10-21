@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " S ",
+        "GPF",
+        " I "
+    ],
+    "key": {
+        "G": "minecraft:gunpowder",
+        "S": "minecraft:fermented_spider_eye",
+        "I": "minecraft:ink_sac",
+        "F": "minecraft:feather",
+        "P": "minecraft:paper"
+    },
+    "result": {
+        "id": "cobblemon:weakness_policy"
+    }
+}

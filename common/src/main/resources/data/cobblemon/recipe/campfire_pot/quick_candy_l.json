@@ -1,0 +1,20 @@
+{
+    "type": "cobblemon:cooking_pot",
+    "group": "iv_candy",
+    "category": "misc",
+    "key": {
+        "T": "cobblemon:tamato_berry",
+        "H": "minecraft:honeycomb",
+        "E": "cobblemon:exp_candy_l"
+    },
+    "pattern": [
+        "THT",
+        "HEH",
+        "THT"
+    ],
+    "result": {
+        "id": "cobblemon:quick_candy"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "CN ",
+        "CCG",
+        "GG "
+    ],
+    "key": {
+        "G": "#c:ingots/gold",
+        "N": "#c:nuggets/gold",
+        "C": "minecraft:clay_ball"
+    },
+    "result": {
+        "id": "cobblemon:cracked_pot"
+    }
+}

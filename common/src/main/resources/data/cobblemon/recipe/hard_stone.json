@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+	"SGS",
+    "SSS"
+  ],
+  "key": {
+    "G": "cobblemon:rock_gem",
+    "S": [
+      "minecraft:stone",
+      "minecraft:deepslate",
+      "minecraft:blackstone",
+      "minecraft:tuff"
+    ]
+  },
+  "result": {
+    "id": "cobblemon:hard_stone"
+  }
+}

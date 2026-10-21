@@ -1,0 +1,13 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "medicines",
+    "ingredients": [
+        "minecraft:glass_bottle",
+        "cobblemon:cheri_berry"
+    ],
+    "result": {
+        "id": "cobblemon:paralyze_heal"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

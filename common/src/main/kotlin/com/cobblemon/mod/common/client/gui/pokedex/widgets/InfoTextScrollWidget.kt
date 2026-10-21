@@ -1,0 +1,148 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.client.gui.pokedex.widgets
+
+import com.cobblemon.mod.common.api.gui.MultiLineLabelK
+import com.cobblemon.mod.common.api.gui.blitk
+import com.cobblemon.mod.common.api.text.text
+import com.cobblemon.mod.common.client.gui.ScrollingWidget
+import com.cobblemon.mod.common.client.gui.pokedex.PokedexGUIConstants.HALF_OVERLAY_WIDTH
+import com.cobblemon.mod.common.client.gui.pokedex.PokedexGUIConstants.POKEMON_DESCRIPTION_HEIGHT
+import com.cobblemon.mod.common.client.gui.pokedex.PokedexGUIConstants.POKEMON_DESCRIPTION_PADDING
+import com.cobblemon.mod.common.client.gui.pokedex.PokedexGUIConstants.SCALE
+import com.cobblemon.mod.common.util.cobblemonResource
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import net.minecraft.util.Mth
+
+abstract class InfoTextScrollWidget(val pX: Int, val pY: Int): ScrollingWidget<InfoTextScrollWidget.TextSlot>(
+    left = pX,
+    top = pY - POKEMON_DESCRIPTION_HEIGHT,
+    width = HALF_OVERLAY_WIDTH,
+    height = POKEMON_DESCRIPTION_HEIGHT
+) {
+    companion object {
+        const val SCROLL_TRACK_WIDTH = 1
+        const val SCROLL_SLIDE_WIDTH = 3
+
+        val scrollbarSlide = cobblemonResource("textures/gui/pokedex/info_scrollbar_slide.png")
+        val scrollbarTrack = cobblemonResource("textures/gui/pokedex/info_scrollbar_track.png")
+        private val scrollBorder = cobblemonResource("textures/gui/pokedex/info_scroll_border.png")
+    }
+
+    override fun extractWidgetRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
+        super.extractWidgetRenderState(context, mouseX, mouseY, delta)
+
+        blitk(
+            context = context,
+            texture = scrollBorder,
+            x = (pX + 1) / SCALE,
+            y = (pY + 40) / SCALE,
+            width = 266,
+            height = 4,
+            textureHeight = 8,
+            vOffset = 4,
+            scale = SCALE
+        )
+    }
+    override fun addEntry(entry: TextSlot): Int {
+        return super.addEntry(entry)
+    }
+
+    fun setText(text: Collection<String>) {
+        clearEntries()
+        text.forEach {
+            Minecraft.getInstance().font.splitter.splitLines(
+                it.text(),
+                ((width - SCROLL_SLIDE_WIDTH  - (POKEMON_DESCRIPTION_PADDING * 2)) / SCALE).toInt(),
+                Style.EMPTY
+            ).stream()
+                .map { it.string }
+                .forEach { addEntry(TextSlot(it)) }
+        }
+        setScrollAmount(0.0)
+    }
+
+    override fun renderScrollbar(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
+        val xLeft = this.scrollBarX()
+        val yMargin = 1
+        val yStart = y + yMargin
+
+        val barHeight = this.bottom - yMargin - yStart
+
+        var yBottom = ((barHeight * barHeight).toFloat() / this.maxPosition.toFloat()).toInt()
+        yBottom = Mth.clamp(yBottom, 32, barHeight - 8)
+        var yTop = scrollAmount().toInt() * (barHeight - yBottom) / this.maxScroll + yStart
+        if (yTop < yStart) yTop = yStart
+
+        // Scroll Track
+        blitk(
+            texture = scrollbarTrack,
+            context = context,
+            x = xLeft + 1,
+            y = yStart,
+            width = SCROLL_TRACK_WIDTH,
+            height = height - (yMargin * 2)
+        )
+
+        // Scroll Slide
+        blitk(
+            texture = scrollbarSlide,
+            context = context,
+            x = xLeft,
+            y = yTop,
+            width = SCROLL_SLIDE_WIDTH,
+            height = yBottom
+        )
+    }
+
+    override fun scrollBarX(): Int {
+        return left + width - scrollBarWidth
+    }
+
+    class TextSlot(val text : String) : Slot<TextSlot>() {
+        override fun extractRenderState(
+            context: GuiGraphicsExtractor,
+            index: Int,
+            y: Int,
+            x: Int,
+            entryWidth: Int,
+            entryHeight: Int,
+            mouseX: Int,
+            mouseY: Int,
+            hovered: Boolean,
+            tickDelta: Float
+        ) {
+            val matrices = context.pose()
+
+            matrices.pushMatrix()
+            MultiLineLabelK.create(
+                component = text.text(),
+                width = (139 - SCROLL_SLIDE_WIDTH - (POKEMON_DESCRIPTION_PADDING * 2)) / SCALE,
+                maxLines = 30
+            ).renderLeftAligned(
+                context = context,
+                x = x + POKEMON_DESCRIPTION_PADDING,
+                y = y + 3,
+                YStartOffset = 3,
+                ySpacing = 0,
+                colour = 0x606B6E,
+                scale = SCALE,
+                shadow = false
+            )
+            matrices.popMatrix()
+        }
+
+        override fun getNarration(): Component {
+            return Component.literal(text)
+        }
+    }
+}

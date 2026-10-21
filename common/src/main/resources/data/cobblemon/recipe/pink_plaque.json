@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "CC",
+	"ID",
+        "II"
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "C": "#c:chains",
+        "D": "#c:dyes/pink"
+    },
+    "result": {
+        "id": "cobblemon:pink_plaque"
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "foods",
+    "ingredients": [
+        {
+            "fabric:type": "fabric:any",
+            "ingredients": [
+                "minecraft:apple",
+                "#cobblemon:apples"
+            ]
+        },
+        "minecraft:sugar",
+        "minecraft:stick"
+    ],
+    "result": {
+        "id": "cobblemon:candied_apple",
+        "count": 1
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

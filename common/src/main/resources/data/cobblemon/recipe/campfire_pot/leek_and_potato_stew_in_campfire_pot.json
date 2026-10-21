@@ -1,0 +1,14 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "foods",
+    "ingredients": [
+        "cobblemon:medicinal_leek",
+        "minecraft:baked_potato",
+        "minecraft:bowl"
+    ],
+    "result": {
+        "id": "cobblemon:leek_and_potato_stew"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

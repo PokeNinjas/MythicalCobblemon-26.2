@@ -1,0 +1,15 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "foods",
+    "ingredients": [
+        "minecraft:wheat",
+        "#c:drinks/milk",
+        "minecraft:sugar",
+        "minecraft:melon"
+    ],
+    "result": {
+        "id": "cobblemon:big_malasada"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "group": "bark",
+    "pattern": [
+        "##",
+        "##"
+    ],
+    "key": {
+        "#": "cobblemon:stripped_apricorn_log"
+    },
+    "result": {
+        "count": 3,
+        "id": "cobblemon:stripped_apricorn_wood"
+    }
+}

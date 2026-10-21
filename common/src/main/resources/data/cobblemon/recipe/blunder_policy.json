@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " R ",
+        "SPF",
+        " I "
+    ],
+    "key": {
+        "R": "minecraft:rabbit_foot",
+        "S": "minecraft:sugar",
+        "I": "minecraft:ink_sac",
+        "F": "minecraft:feather",
+        "P": "minecraft:paper"
+    },
+    "result": {
+        "id": "cobblemon:blunder_policy"
+    }
+}

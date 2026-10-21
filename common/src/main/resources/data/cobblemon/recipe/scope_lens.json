@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " GA",
+        "GGA",
+        "II "
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "G": "#c:ingots/gold",
+        "A": "#c:gems/amethyst"
+    },
+    "result": {
+        "id": "cobblemon:scope_lens"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "SDS",
+        "GAG",
+        " D "
+    ],
+    "key": {
+        "G": "#c:ingots/gold",
+        "D": "#c:gems/diamond",
+        "S": "#c:strings",
+        "A": "#c:gems/amethyst"
+    },
+    "result": {
+        "id": "cobblemon:clear_amulet"
+    }
+}

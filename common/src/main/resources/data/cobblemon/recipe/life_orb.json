@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GTA",
+        "TET",
+        "ATG"
+    ],
+    "key": {
+        "A": "minecraft:golden_apple",
+        "T": "minecraft:tinted_glass",
+        "E": "minecraft:ender_pearl",
+        "G": "minecraft:ghast_tear"
+    },
+    "result": {
+        "id": "cobblemon:life_orb"
+    }
+}

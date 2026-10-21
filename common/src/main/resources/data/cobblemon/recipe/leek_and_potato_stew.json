@@ -1,0 +1,11 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "cobblemon:roasted_leek",
+        "minecraft:baked_potato",
+        "minecraft:bowl"
+    ],
+    "result": {
+        "id": "cobblemon:leek_and_potato_stew"
+    }
+}

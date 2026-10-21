@@ -1,0 +1,15 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "group": "alcremie_sweet",
+    "category": "misc",
+    "ingredients": [
+        "#c:dyes/yellow",
+        "minecraft:honey_bottle",
+        "minecraft:sugar"
+    ],
+    "result": {
+        "id": "cobblemon:star_sweet"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

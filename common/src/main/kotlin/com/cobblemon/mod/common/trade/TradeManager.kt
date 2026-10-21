@@ -1,0 +1,171 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.trade
+
+import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.api.interaction.RequestManager
+import com.cobblemon.mod.common.api.events.CobblemonEvents
+import com.cobblemon.mod.common.api.events.pokemon.TradeEvent
+import com.cobblemon.mod.common.api.interaction.ServerPlayerActionRequest
+import com.cobblemon.mod.common.api.net.NetworkPacket
+import com.cobblemon.mod.common.api.text.aqua
+import com.cobblemon.mod.common.net.messages.client.trade.TradeOfferExpiredPacket
+import com.cobblemon.mod.common.net.messages.client.trade.TradeOfferNotificationPacket
+import com.cobblemon.mod.common.net.messages.client.trade.TradeStartedPacket
+import com.cobblemon.mod.common.net.messages.client.trade.TradeStartedPacket.TradeablePokemon
+import com.cobblemon.mod.common.pokemon.Pokemon
+import com.cobblemon.mod.common.pokemon.evolution.variants.TradeEvolution
+import com.cobblemon.mod.common.util.canInteractWith
+import com.cobblemon.mod.common.util.party
+import java.util.UUID
+import net.minecraft.server.level.ServerPlayer
+
+/**
+ * Responsible for managing [ActiveTrade]s and the respective [TradeRequest]s that create them.
+ *
+ * @author Hiroku
+ * @since March 4th, 2023
+ */
+object TradeManager : RequestManager<TradeManager.TradeRequest>() {
+
+    init {
+        register(this)
+    }
+
+    /**
+     * Represents an interaction request between players to trade.
+     *
+     * @param sender The player sending this request.
+     * @param receiver The player receiving this request.
+     * @param expiryTime How long (in seconds) this request is active.
+     */
+    data class TradeRequest(
+        override val sender: ServerPlayer,
+        override val receiver: ServerPlayer,
+        override val expiryTime: Int = 20
+    ) : ServerPlayerActionRequest {
+        override val key: String = "trade"
+        override val requestID: UUID = UUID.randomUUID()
+    }
+
+    private val activeTrades = mutableListOf<ActiveTrade>()
+
+    fun removeActiveTrade(trade: ActiveTrade) = activeTrades.remove(trade)
+
+    fun getActiveTrade(playerId: UUID) = activeTrades.find { it.player1.uuid == playerId || it.player2.uuid == playerId }
+
+    override fun expirationPacket(request: TradeRequest): NetworkPacket<*> = TradeOfferExpiredPacket(request)
+
+    override fun notificationPacket(request: TradeRequest): NetworkPacket<*> = TradeOfferNotificationPacket(request)
+
+    override fun onAccept(request: TradeRequest) {
+        val trade = ActiveTrade(PlayerTradeParticipant(request.receiver), PlayerTradeParticipant(request.sender))
+        activeTrades.add(trade)
+        request.sendToSender(TradeStartedPacket(request.receiver.uuid, request.receiver.name.plainCopy(), trade.player1.party.mapNullPreserving(::TradeablePokemon)))
+        request.sendToReceiver(TradeStartedPacket(request.sender.uuid, request.sender.name.plainCopy(), trade.player2.party.mapNullPreserving(::TradeablePokemon)))
+    }
+
+    override fun canAccept(request: TradeRequest): Boolean {
+        if (request.sender.party().none()) {
+            request.notifySender(true, "error.insufficient_pokemon.self")
+            request.notifyReceiver(true, "error.insufficient_pokemon.other", request.sender.name.copy().aqua())
+        }
+        else if (request.receiver.party().none()) {
+            request.notifySender(true, "error.insufficient_pokemon.other", request.sender.name.copy().aqua())
+            request.notifyReceiver(true, "error.insufficient_pokemon.self")
+        }
+        // isBusy already checks if sender is in an active trade
+        else return true
+        return false
+    }
+
+    override fun isValidInteraction(player: ServerPlayer, target: ServerPlayer): Boolean = player.canInteractWith(target, Cobblemon.config.tradeMaxDistance)
+
+    override fun onLogoff(player: ServerPlayer) {
+        super.onLogoff(player)
+        val trade = this.getActiveTrade(player.uuid)
+        if (trade != null) {
+            val tradeParticipant = trade.getTradeParticipant(player.uuid)
+            val oppositeParticipant = trade.getOppositePlayer(tradeParticipant)
+            oppositeParticipant.cancelTrade(trade)
+            this.removeActiveTrade(trade)
+        }
+    }
+
+    fun performTrade(
+        activeTrade: ActiveTrade,
+        player1: TradeParticipant,
+        pokemon1: Pokemon,
+        player2: TradeParticipant,
+        pokemon2: Pokemon
+    ) {
+        val party1 = player1.party
+        val party2 = player2.party
+
+        if (pokemon1 !in party1 || pokemon2 !in party2) {
+            Cobblemon.LOGGER.warn("Attempted to perform a trade with Pokémon that aren't in the party anymore. Could be attempted duping between ${player1.name} and ${player2.name}")
+            activeTrade.cancelTrade()
+            return
+        }
+
+        CobblemonEvents.TRADE_EVENT_PRE.postThen(TradeEvent.Pre(player1, pokemon2, player2, pokemon1)) {
+            val party1 = player1.party
+            val party2 = player2.party
+
+            val player1Removed = party1.remove(pokemon1)
+            val player2Removed = party2.remove(pokemon2)
+
+            if (!player1Removed || !player2Removed) {
+                if (!player1Removed) {
+                    Cobblemon.LOGGER.warn("Failed to remove traded Pokémon ${pokemon1.species.resourceIdentifier} from ${player1.name.string}(${player1.uuid}). Aborting trade with ${player2.name.string}(${player2.uuid}), potential exploit abused.")
+                }
+
+                if (!player2Removed) {
+                    Cobblemon.LOGGER.warn("Failed to remove traded Pokémon ${pokemon2.species.resourceIdentifier} from ${player2.name.string}(${player2.uuid}). Aborting trade with ${player1.name.string}(${player1.uuid}), potential exploit abused.")
+                }
+
+                // Revert any changes if one of the removals failed
+                if (player1Removed) party1.add(pokemon1)
+                if (player2Removed) party2.add(pokemon2)
+                return@postThen
+            }
+
+            // If player1 is the OT, keep track of the friendship
+            pokemon1.cacheFriendship(player1.uuid)
+            // If player2 is the OT, keep track of the friendship
+            pokemon2.cacheFriendship(player2.uuid)
+
+            // If pokemon2 was originally player1's, set the friendship back to what it was at point of trading
+            if ( !pokemon2.restoreFriendship(player1.uuid) ) {
+                // Otherwise, reset the friendship
+                pokemon2.setFriendship(pokemon2.form.baseFriendship)
+            }
+            // If pokemon1 was originally player2's, set the friendship back to what it was at point of trading
+            if ( !pokemon1.restoreFriendship(player2.uuid) ) {
+                // Otherwise, reset the friendship
+                pokemon1.setFriendship(pokemon1.form.baseFriendship)
+            }
+
+            party2.add(pokemon1)
+            party1.add(pokemon2)
+
+            pokemon1.lockedEvolutions.filterIsInstance<TradeEvolution>().firstOrNull {
+                it.attemptEvolution(pokemon1, pokemon2)
+            }
+
+            pokemon2.lockedEvolutions.filterIsInstance<TradeEvolution>().firstOrNull {
+                it.attemptEvolution(pokemon2, pokemon1)
+            }
+
+            activeTrade.completeTrade()
+
+            CobblemonEvents.TRADE_EVENT_POST.post(TradeEvent.Post(player1, pokemon2, player2, pokemon1))
+        }
+    }
+}

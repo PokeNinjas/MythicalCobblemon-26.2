@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:blasting",
+    "group": "water_stone",
+    "ingredient": "cobblemon:deepslate_water_stone_ore",
+    "result": {
+        "id": "cobblemon:water_stone"
+    },
+    "experience": 0.2,
+    "cookingtime": 100
+}

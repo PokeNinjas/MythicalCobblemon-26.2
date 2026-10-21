@@ -1,0 +1,124 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.api.storage
+
+import com.cobblemon.mod.common.Cobblemon.LOGGER
+import com.cobblemon.mod.common.api.reactive.SimpleObservable
+import com.cobblemon.mod.common.pokemon.Pokemon
+import com.cobblemon.mod.common.util.DataKeys
+import com.google.gson.JsonObject
+import java.util.UUID
+import net.minecraft.core.RegistryAccess
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.server.level.ServerPlayer
+
+class BottomlessPosition(val currentIndex: Int) : StorePosition
+
+/**
+ * A [PokemonStore] that has no maximum capacity. It's used internally as an overflow store.
+ *
+ * @author Hiroku
+ * @since May 2nd, 2022
+ */
+open class BottomlessStore(override val uuid: UUID) : PokemonStore<BottomlessPosition>() {
+    val pokemon = mutableListOf<Pokemon>()
+    val storeChangeObservable = SimpleObservable<Unit>()
+
+    override fun iterator() = pokemon.iterator()
+
+    override fun get(position: BottomlessPosition) = position.currentIndex
+        .takeIf { it in pokemon.indices }
+        ?.let { pokemon[it] }
+
+    override fun getFirstAvailablePosition() = BottomlessPosition(pokemon.size)
+    override fun isValidPosition(position: BottomlessPosition) = position.currentIndex >= 0
+    operator fun get(index: Int) = index.takeIf { it in pokemon.indices }?.let { pokemon[it] }
+    override fun getObservingPlayers() = emptySet<ServerPlayer>()
+    override fun sendTo(player: ServerPlayer) {}
+
+    override fun initialize() {
+        pokemon.forEachIndexed { index, pokemon ->
+            pokemon.storeCoordinates.set(StoreCoordinates(this, BottomlessPosition(index)))
+        }
+        rebuildPokemonByUuid()
+    }
+
+    override fun saveToNBT(nbt: CompoundTag, registryAccess: RegistryAccess): CompoundTag {
+        pokemon.forEachIndexed { index, pokemon -> nbt.put(DataKeys.STORE_SLOT + index, pokemon.saveToNBT(registryAccess)) }
+        return nbt
+    }
+
+    override fun loadFromNBT(nbt: CompoundTag, registryAccess: RegistryAccess): BottomlessStore {
+        val slotKeys = nbt.keySet().filter { it.startsWith(DataKeys.STORE_SLOT) }
+        StorageLoadValidation.validateSlotKeys(slotKeys.toSet(), DataKeys.STORE_SLOT, slotKeys.size)
+        val loaded = slotKeys.indices.map { index ->
+            val key = DataKeys.STORE_SLOT + index
+            Pokemon.loadFromNBT(registryAccess, nbt.getCompound(key).orElseThrow())
+        }
+        StorageLoadValidation.requireUnique(loaded) { it.uuid }
+        pokemon.clear()
+        pokemon.addAll(loaded)
+        rebuildPokemonByUuid()
+        return this
+    }
+
+    override fun saveToJSON(json: JsonObject, registryAccess: RegistryAccess): JsonObject {
+        pokemon.forEachIndexed { index, pokemon -> json.add(DataKeys.STORE_SLOT + index, pokemon.saveToJSON(registryAccess)) }
+        return json
+    }
+
+    override fun loadFromJSON(json: JsonObject, registryAccess: RegistryAccess): BottomlessStore {
+        val slotKeys = json.keySet().filter { it.startsWith(DataKeys.STORE_SLOT) }
+        StorageLoadValidation.validateSlotKeys(slotKeys.toSet(), DataKeys.STORE_SLOT, slotKeys.size)
+        val loaded = slotKeys.indices.map { index ->
+            val key = DataKeys.STORE_SLOT + index
+            Pokemon.loadFromJSON(registryAccess, json.getAsJsonObject(key))
+        }
+        StorageLoadValidation.requireUnique(loaded) { it.uuid }
+        pokemon.clear()
+        pokemon.addAll(loaded)
+        rebuildPokemonByUuid()
+        return this
+    }
+
+    override fun loadPositionFromNBT(nbt: CompoundTag): StoreCoordinates<BottomlessPosition> {
+        val slot = nbt.getInt(DataKeys.STORE_SLOT).orElseThrow()
+        require(slot >= 0) { "Invalid overflow position: $slot" }
+        return StoreCoordinates(this, BottomlessPosition(slot))
+    }
+
+    override fun savePositionToNBT(position: BottomlessPosition, nbt: CompoundTag) {
+        nbt.putInt(DataKeys.STORE_SLOT, position.currentIndex)
+    }
+
+    override fun getAnyChangeObservable() = storeChangeObservable
+
+    override fun setAtPosition(position: BottomlessPosition, pokemon: Pokemon?) {
+        if (position.currentIndex == this.pokemon.size && pokemon != null) {
+            this.pokemon.add(pokemon)
+            storeChangeObservable.emit(Unit)
+        } else if (position.currentIndex in 0 until this.pokemon.size) {
+            var startIndex = position.currentIndex
+            if (pokemon != null) {
+                this.pokemon.add(position.currentIndex, pokemon)
+                startIndex += 1
+            } else {
+                this.pokemon.removeAt(position.currentIndex)
+            }
+            for (i in startIndex until this.pokemon.size) {
+                this.pokemon[i].storeCoordinates.set(StoreCoordinates(this, BottomlessPosition(i)))
+            }
+            storeChangeObservable.emit(Unit)
+        }
+    }
+
+    override fun onPokemonChanged(pokemon: Pokemon) {
+        this.storeChangeObservable.emit(Unit)
+    }
+}

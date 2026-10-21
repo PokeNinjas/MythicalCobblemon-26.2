@@ -1,0 +1,80 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.api.storage.player.adapter
+
+import com.cobblemon.mod.common.api.storage.adapter.flatfile.StoreFileRecovery
+import com.cobblemon.mod.common.api.storage.adapter.flatfile.AtomicStoreFile
+import com.cobblemon.mod.common.api.storage.player.InstancedPlayerData
+import com.cobblemon.mod.common.api.storage.player.PlayerInstancedDataStoreType
+import net.minecraft.server.MinecraftServer
+import net.minecraft.world.level.storage.LevelResource
+import java.io.File
+import java.nio.file.Path
+import java.util.UUID
+
+/**
+ * A [PlayerDataStoreBackend] that stores the [InstancedPlayerData] in a file.
+ *
+ * @author Apion
+ * @since February 21, 2024
+ */
+abstract class FileBasedPlayerDataStoreBackend<T : InstancedPlayerData>(
+    val subfolder: String,
+    val type: PlayerInstancedDataStoreType,
+    val fileExt: String
+) : PlayerDataStoreBackend<T>(type) {
+
+    abstract val defaultData: (UUID) -> (T)
+    lateinit var savePath: Path
+    val useNestedStructure = true
+
+    override fun setup(server: MinecraftServer) {
+        savePath = PlayerDataPaths.prepare(
+            server.getWorldPath(LevelResource.ROOT),
+            server.getWorldPath(LevelResource.PLAYER_DATA_DIR).parent,
+            subfolder
+        )
+    }
+
+    protected fun postSaveFileMoving(uuid: UUID) {
+        val tempFile = filePath(uuid, TEMPORARY_FILE_EXTENSION)
+        val file = filePath(uuid)
+        AtomicStoreFile.commit(tempFile.toPath(), file.toPath())
+    }
+
+    protected fun loadWithFallback(uuid: UUID, loadFunction: (File) -> T): T {
+        val playerFile = filePath(uuid)
+        playerFile.parentFile.mkdirs()
+        val loaded = StoreFileRecovery.load(playerFile) { file ->
+            loadFunction(file).also { data ->
+                require(data.uuid == uuid) { "Player data identity mismatch in $file: expected $uuid, found ${data.uuid}" }
+            }
+        }
+        // Only a genuinely new player may receive defaults. Recovery preserves
+        // unreadable bytes and refuses to overwrite an existing damaged record.
+        return (loaded ?: defaultData(uuid).also(::save)).also { it.initialize() }
+    }
+
+    @JvmOverloads
+    fun getSubFile(uuid: UUID, extension: String? = null): String {
+        return if (useNestedStructure) {
+            "${uuid.toString().substring(0, 2)}/$uuid.$fileExt${if (extension != null) ".$extension" else ""}"
+        } else {
+            "$uuid.$fileExt.${if (extension != null) ".$extension" else ""}"
+        }
+    }
+
+    @JvmOverloads
+    fun filePath(uuid: UUID, extension: String? = null): File = savePath.resolve("$subfolder/${getSubFile(uuid, extension)}").toFile()
+
+    companion object {
+        const val OLD_FILE_EXTENSION = "old"
+        const val TEMPORARY_FILE_EXTENSION = "tmp"
+    }
+}

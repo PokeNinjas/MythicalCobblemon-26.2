@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "III",
+        "CGC",
+        "IRI"
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "G": "minecraft:glass",
+        "C": "#c:ingots/copper",
+        "R": "minecraft:redstone_torch"
+    },
+    "result": {
+        "id": "cobblemon:monitor"
+    }
+}

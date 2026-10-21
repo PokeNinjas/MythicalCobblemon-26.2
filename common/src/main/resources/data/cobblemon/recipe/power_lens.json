@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "MCD",
+        "C C",
+        "DCM"
+    ],
+    "key": {
+        "M": "cobblemon:cyan_mint_leaf",
+        "C": "#c:concretes",
+        "D": "#c:gems/diamond"
+    },
+    "result": {
+        "id": "cobblemon:power_lens"
+    }
+}

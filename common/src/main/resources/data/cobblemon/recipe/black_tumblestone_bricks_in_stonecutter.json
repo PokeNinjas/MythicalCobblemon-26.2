@@ -1,0 +1,8 @@
+{
+    "type": "minecraft:stonecutting",
+    "ingredient": "cobblemon:polished_black_tumblestone",
+    "result": {
+        "id": "cobblemon:black_tumblestone_bricks",
+    "count": 1
+    }
+}

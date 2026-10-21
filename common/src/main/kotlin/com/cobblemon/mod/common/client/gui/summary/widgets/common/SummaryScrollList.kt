@@ -1,0 +1,124 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.client.gui.summary.widgets.common
+
+import net.minecraft.client.input.MouseButtonEvent
+
+import com.cobblemon.mod.common.api.gui.blitk
+import com.cobblemon.mod.common.api.text.bold
+import com.cobblemon.mod.common.client.CobblemonResources
+import com.cobblemon.mod.common.client.gui.CobblemonRenderable
+import com.cobblemon.mod.common.client.render.drawScaledText
+import com.cobblemon.mod.common.util.cobblemonResource
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.components.ObjectSelectionList
+import net.minecraft.network.chat.MutableComponent
+
+abstract class SummaryScrollList<T : ObjectSelectionList.Entry<T>>(
+    val listX: Int,
+    val listY: Int,
+    val label: MutableComponent,
+    slotHeight: Int
+) : ObjectSelectionList<T>(
+    Minecraft.getInstance(),
+    WIDTH, // width
+    HEIGHT, // height
+    0, // top
+    slotHeight
+), CobblemonRenderable {
+    companion object {
+        const val WIDTH = 108
+        const val HEIGHT = 112
+        const val SLOT_WIDTH = 91
+
+        private val backgroundResource = cobblemonResource("textures/gui/summary/summary_scroll_background.png")
+        private val scrollOverlayResource = cobblemonResource("textures/gui/summary/summary_scroll_overlay.png")
+    }
+
+
+    override fun getRowWidth(): Int {
+        return SLOT_WIDTH
+    }
+
+    init {
+        this.x = listX
+        this.y = listY
+        correctSize()
+    }
+
+    override fun scrollbarWidth(): Int = 3
+
+    override fun scrollBarX(): Int {
+        return x + width - 3
+    }
+
+    override fun extractListBackground(context: GuiGraphicsExtractor) {}
+
+    override fun extractWidgetRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
+        val matrices = context.pose()
+        correctSize()
+
+        blitk(
+            context = context,
+            texture = backgroundResource,
+            x = listX,
+            y = listY,
+            height = HEIGHT,
+            width = WIDTH
+        )
+        context.enableScissor(
+            x,
+            y,
+            x + width,
+            y + height
+        )
+        super.extractWidgetRenderState(context, mouseX, mouseY, partialTicks)
+        context.disableScissor()
+
+        // Scroll Overlay
+        val scrollOverlayOffset = 4
+        blitk(
+            context = context,
+            texture = scrollOverlayResource,
+            x = listX,
+            y = listY - (scrollOverlayOffset / 2) - 1,
+            height = HEIGHT + scrollOverlayOffset + 2,
+            width = WIDTH
+        )
+
+        // Label
+        drawScaledText(
+            context = context,
+            font = CobblemonResources.DEFAULT_LARGE,
+            text = label.bold(),
+            x = listX + 32.5,
+            y = listY - 13.5,
+            centered = true,
+            shadow = true
+        )
+
+    }
+
+    override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
+        val mouseX = event.x()
+        val mouseY = event.y()
+        val button = event.button()
+
+        return super.mouseClicked(event, doubleClick)
+    }
+
+
+
+
+
+    private fun correctSize() {
+        updateSizeAndPosition(WIDTH, HEIGHT, listX, listY)
+    }
+}

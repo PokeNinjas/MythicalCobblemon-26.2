@@ -1,0 +1,177 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.17.20'
+    id 'org.jetbrains.kotlin.jvm' version '2.4.20'
+}
+
+group = 'com.cobblemon.mod'
+version = '1.8.2+26.2.mythical.8'
+base { archivesName = 'cobblemon-code-only' }
+
+repositories {
+    maven { url = 'https://maven.gegy.dev' }
+    mavenCentral()
+    maven { url = 'https://api.modrinth.com/maven' }
+    maven { url = uri('../dependencies/maven') }
+    maven { url = 'https://maven.fabricmc.net/' }
+    maven { url = 'https://maven.blamejared.com/' }
+}
+
+dependencies {
+    minecraft 'net.minecraft:minecraft:26.2'
+    implementation 'net.fabricmc:fabric-loader:0.19.5'
+    implementation 'net.fabricmc.fabric-api:fabric-api:0.160.0+26.2'
+    implementation 'net.fabricmc:fabric-language-kotlin:1.14.1+kotlin.2.4.20'
+    compileOnly 'maven.modrinth:modmenu:20.0.2'
+    compileOnly 'maven.modrinth:adorn:9.0.0-fabric'
+    compileOnly 'dev.lambdaurora.lambdynamiclights:lambdynamiclights-api:4.12.4+26.2'
+    compileOnly 'mezz.jei:jei-26.2-common-api:30.32.0.215'
+    compileOnly 'mezz.jei:jei-26.2-fabric-api:30.32.0.215'
+    implementation 'local.com.bedrockk:molang:1.1.20'
+    include 'local.com.bedrockk:molang:1.1.20'
+    implementation 'org.graalvm.polyglot:polyglot:25.0.4'
+    // Loom scans runtime files as jars; use the aggregator POM's concrete artifacts.
+    runtimeOnly 'org.graalvm.js:js-language:25.0.4'
+    runtimeOnly 'org.graalvm.truffle:truffle-runtime:25.0.4'
+    implementation 'org.mongodb:mongodb-driver-sync:4.10.2'
+    implementation 'me.lucko:fabric-permissions-api:0.7.0'
+
+    // The development classpath is not available in a launcher or dedicated
+    // server. Include the concrete runtime closure; Fabric Kotlin carries its
+    // own nested dependencies. Fabric API remains the one external mod.
+    [
+        'net.fabricmc:fabric-language-kotlin:1.14.1+kotlin.2.4.20',
+        'me.lucko:fabric-permissions-api:0.7.0',
+        'org.graalvm.polyglot:polyglot:25.0.4',
+        'org.graalvm.js:js-language:25.0.4',
+        'org.graalvm.regex:regex:25.0.4',
+        'org.graalvm.truffle:truffle-api:25.0.4',
+        'org.graalvm.truffle:truffle-runtime:25.0.4',
+        'org.graalvm.truffle:truffle-compiler:25.0.4',
+        'org.graalvm.sdk:collections:25.0.4',
+        'org.graalvm.sdk:nativeimage:25.0.4',
+        'org.graalvm.sdk:word:25.0.4',
+        'org.graalvm.sdk:jniutils:25.0.4',
+        'org.graalvm.shadowed:icu4j:25.0.4',
+        'org.graalvm.shadowed:xz:25.0.4',
+        'org.mongodb:mongodb-driver-sync:4.10.2',
+        'org.mongodb:mongodb-driver-core:4.10.2',
+        'org.mongodb:bson:4.10.2',
+        'org.mongodb:bson-record-codec:4.10.2'
+    ].each { include it }
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core:5.20.0'
+    testImplementation 'io.mockk:mockk:1.13.14'
+    testImplementation 'io.github.classgraph:classgraph:4.8.179'
+}
+
+java { toolchain.languageVersion = JavaLanguageVersion.of(25) }
+kotlin { jvmToolchain(25) }
+
+// Compile common and Fabric sources together.
+sourceSets {
+    main {
+        java.srcDir '../common/src/main/java'
+        kotlin.srcDir '../common/src/main/kotlin'
+        kotlin.srcDir layout.buildDirectory.dir('generated/sources/buildDetails')
+        resources.srcDir '../common/src/main/resources'
+    }
+    test {
+        java.srcDir '../common/src/test/java'
+        kotlin.srcDir '../common/src/test/kotlin'
+        resources.srcDir '../common/src/test/resources'
+    }
+}
+
+tasks.register('generateBuildDetails') {
+    def template = file('../common/src/main/kotlin-templates/CobblemonBuildDetails.kt.peb')
+    def header = file('../HEADER')
+    def output = layout.buildDirectory.file('generated/sources/buildDetails/com/cobblemon/mod/common/CobblemonBuildDetails.kt')
+    inputs.files(template, header)
+    inputs.property('version', project.version.toString())
+    outputs.file(output)
+    doLast {
+        def license = '/*\n' + header.readLines().collect { ' * ' + it }.join('\n') + '\n */'
+        def rendered = template.text.replace('{{ license }}', license)
+            .replace('{{ modid }}', 'cobblemon')
+            .replace('{{ version }}', project.version.toString())
+            .replace('{{ isSnapshot }}', 'true')
+            .replace('{{ gitCommit | default("Not Specified") }}', 'source-release')
+            .replace('{{ branch | default("Not Specified") }}', '26.2')
+        output.get().asFile.parentFile.mkdirs()
+        output.get().asFile.setText(rendered, 'UTF-8')
+    }
+}
+
+tasks.named('compileKotlin') {
+    dependsOn 'generateBuildDetails'
+    // Preserve the published Kotlin ABI, including mangled internal method names.
+    compilerOptions.moduleName.set('com.cobblemon.mod:cobblemon-fabric-26.2-private')
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.compilerArgs += ['-Xmaxerrs', '1000'] }
+tasks.withType(Test).configureEach { useJUnitPlatform() }
+tasks.withType(Jar).configureEach {
+    from('../LICENSE')
+    from('../THIRD_PARTY_NOTICES.md')
+    from('../LICENSES') { into 'META-INF/licenses' }
+}
+
+// Focused regressions now compile and run against the complete production source set.
+sourceSets {
+    migrationTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+configurations.migrationTestImplementation.extendsFrom configurations.testImplementation
+configurations.migrationTestRuntimeOnly.extendsFrom configurations.testRuntimeOnly
+tasks.register('migrationTest', Test) {
+    description = 'Verify focused migration regressions against the full production classes.'
+    testClassesDirs = sourceSets.migrationTest.output.classesDirs
+    classpath = sourceSets.migrationTest.runtimeClasspath
+}
+
+// Fabric 26.2 access widener and development runs.
+loom {
+    accessWidenerPath = file('src/main/resources/cobblemon-26.2.accesswidener')
+    runs {
+        client { client(); runDir 'run-26.2-client'; vmArg '-Xmx4G' }
+        server { server(); runDir 'run-26.2-server'; vmArg '-Xmx4G' }
+    }
+}
+
+tasks.processResources {
+    exclude 'data/**/README.md'
+    inputs.property('version', project.version)
+    filesMatching('fabric.mod.json') {
+        expand version: project.version,
+            fabric_loader_version: '0.19.5', fabric_api_version: '0.160.0+26.2',
+            minecraft_version: '26.2', java_version: '>=25'
+        filter { line -> line.replace('cobblemon-common.accesswidener', 'cobblemon-26.2.accesswidener')
+            .replace('net/minecraft/class_630', 'net/minecraft/client/model/geom/ModelPart') }
+    }
+}
+
+// Allow the development server to receive console commands.
+tasks.withType(JavaExec).configureEach {
+    if (name == "runServer") standardInput = System.in
+}
+
+// Art-dependent regressions can read separately supplied resources.
+// These inputs are test-only and never enter the jar or source archive.
+tasks.named('migrationTest', Test) {
+    def externalResources = providers.gradleProperty('resourceTestRoot')
+    if (externalResources.isPresent()) {
+        def resourceRoot = file(externalResources.get())
+        inputs.dir(resourceRoot)
+        systemProperty 'cobblemon.test.resourceRoot', resourceRoot.absolutePath
+        classpath += files(resourceRoot)
+        doFirst {
+            if (!new File(resourceRoot, 'assets/cobblemon').isDirectory() ||
+                !new File(resourceRoot, 'data/cobblemon/structure').isDirectory()) {
+                throw new GradleException('resourceTestRoot must contain matching assets/ and data/cobblemon/structure/ trees.')
+            }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "minecraft:mud",
+        "minecraft:dirt",
+        "minecraft:moss_block",
+        "minecraft:clay"
+    ],
+    "result": {
+        "id": "cobblemon:peat_block"
+    }
+}

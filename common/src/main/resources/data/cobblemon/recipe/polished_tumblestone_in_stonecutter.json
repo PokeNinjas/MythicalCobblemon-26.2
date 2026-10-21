@@ -1,0 +1,8 @@
+{
+    "type": "minecraft:stonecutting",
+    "ingredient": "cobblemon:tumblestone_block",
+    "result": {
+        "id": "cobblemon:polished_tumblestone",
+    "count": 1
+    }
+}

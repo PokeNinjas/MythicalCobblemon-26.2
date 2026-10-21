@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GCG",
+        "CEC",
+        "GCG"
+    ],
+    "key": {
+        "G": "minecraft:glow_ink_sac",
+        "C": "minecraft:clay_ball",
+        "E": "minecraft:ender_pearl"
+    },
+    "result": {
+        "id": "cobblemon:light_clay"
+    }
+}

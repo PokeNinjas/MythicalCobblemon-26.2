@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "group": "wooden_fence",
+    "pattern": [
+        "W#W",
+        "W#W"
+    ],
+    "key": {
+        "W": "cobblemon:apricorn_planks",
+        "#": "minecraft:stick"
+    },
+    "result": {
+        "count": 3,
+        "id": "cobblemon:apricorn_fence"
+    }
+}

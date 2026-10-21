@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "TLT",
+        "SAS"
+    ],
+    "key": {
+        "T": "minecraft:tinted_glass",
+        "A": "cobblemon:blank_tm",
+        "S": "minecraft:sculk",
+        "L": "minecraft:sea_lantern"
+    },
+    "result": {
+        "id": "cobblemon:dubious_disc"
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "IBI",
+        "YPY",
+        "IRI"
+    ],
+    "key": {
+        "Y": "#c:nuggets/gold",
+        "I": "#c:ingots/iron",
+        "B": "#minecraft:buttons",
+        "R": "#c:dusts/redstone",
+        "P": "minecraft:piston"
+    },
+    "result": {
+        "id": "cobblemon:eject_button"
+    }
+}

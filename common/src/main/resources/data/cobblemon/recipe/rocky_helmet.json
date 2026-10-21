@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "SSS",
+        "LHL",
+        "G G"
+    ],
+    "key": {
+        "G": "#c:ingots/gold",
+        "L": "minecraft:turtle_scute",
+        "S": "cobblemon:hard_stone",
+        "H": "minecraft:golden_helmet"
+    },
+    "result": {
+        "id": "cobblemon:rocky_helmet"
+    }
+}

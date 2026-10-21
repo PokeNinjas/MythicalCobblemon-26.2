@@ -1,0 +1,242 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.client.gui.startselection.widgets
+
+import net.minecraft.client.input.MouseButtonEvent
+
+import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.CobblemonSounds
+import com.cobblemon.mod.common.api.gui.blitk
+import com.cobblemon.mod.common.api.text.bold
+import com.cobblemon.mod.common.client.gui.CobblemonRenderable
+import com.cobblemon.mod.common.client.gui.PokemonGUIAnimationStyle
+import com.cobblemon.mod.common.client.gui.VariableObjectSelectionList
+import com.cobblemon.mod.common.client.gui.drawProfilePokemon
+import com.cobblemon.mod.common.client.gui.startselection.StarterSelectionScreen
+import com.cobblemon.mod.common.client.render.drawScaledText
+import com.cobblemon.mod.common.client.render.models.blockbench.FloatingState
+import com.cobblemon.mod.common.config.starter.RenderableStarterCategory
+import com.cobblemon.mod.common.util.cobblemonResource
+import com.cobblemon.mod.common.util.math.fromEulerXYZDegrees
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.resources.sounds.SimpleSoundInstance
+import org.joml.Quaternionf
+import org.joml.Vector3f
+
+class CategoryList(
+    private val paneWidth: Int,
+    private val paneHeight: Int,
+    private val categories: List<RenderableStarterCategory>,
+    val listX: Int,
+    val listY: Int,
+    private val minecraft: Minecraft = Minecraft.getInstance(),
+    private val starterSelectionScreen: StarterSelectionScreen
+) : VariableObjectSelectionList(
+    listX,
+    listY,
+    paneWidth,
+    paneHeight
+), CobblemonRenderable {
+
+    companion object {
+        private val headerResource = cobblemonResource("textures/gui/starterselection/selection_container_header.png")
+        private val footerResource = cobblemonResource("textures/gui/starterselection/selection_container_footer.png")
+        private val edgeResource = cobblemonResource("textures/gui/starterselection/selection_container_edge.png")
+        private val containerResource = cobblemonResource("textures/gui/starterselection/selection_container.png")
+
+        private val buttonResource = cobblemonResource("textures/gui/starterselection/starter_selection.png")
+        private val buttonActiveResource = cobblemonResource("textures/gui/starterselection/starter_selection_active.png")
+
+        private val unknownResource = cobblemonResource("textures/gui/pokedex/platform_unknown.png")
+
+        const val MARGIN = 4
+        const val HEADER_HEIGHT = 7
+        const val BUTTON_SEPERATION = 3
+        const val CONTAINER_BUTTON_SIZE = 25
+        const val CONTAINER_WIDTH = 89
+    }
+
+    init {
+        addEntry(EmptySeparator(MARGIN))
+        createEntries().forEach {
+            addEntry(it)
+            addEntry(EmptySeparator(MARGIN))
+        }
+    }
+
+    private fun createEntries() = categories.map { category ->
+        val rows = (category.pokemon.size - 1) / 3 + 1
+        val height = CONTAINER_BUTTON_SIZE * rows + BUTTON_SEPERATION * (rows + 1) + HEADER_HEIGHT + 3
+        Category(category, height)
+    }
+
+    inner class Category(private val category: RenderableStarterCategory, height: Int) : Entry(height) {
+
+        override fun render(
+            guiGraphics: GuiGraphicsExtractor,
+            index: Int,
+            x: Int,
+            y: Int,
+            mouseX: Int,
+            mouseY: Int,
+            partialTick: Float
+        ) {
+            val itemSize = category.pokemon.size + if (category.randomStarter) 1 else 0
+            val rows = (itemSize - 1) / 3 + 1
+            val matrices = guiGraphics.pose()
+            //Header
+            blitk(
+                context = guiGraphics,
+                texture = headerResource,
+                x = x + MARGIN,
+                y = y,
+                width = CONTAINER_WIDTH,
+                height = HEADER_HEIGHT
+            )
+
+            val smallTextScale = 0.5F
+            drawScaledText(
+                context = guiGraphics,
+                text = category.displayNameText.bold(),
+                x = x + MARGIN + CONTAINER_WIDTH / 2,
+                y = y + 2,
+                shadow = true,
+                centered = true,
+                scale = smallTextScale
+            )
+
+            //Container
+            var stackHeight = HEADER_HEIGHT
+            blitk(
+                context = guiGraphics,
+                texture = edgeResource,
+                x = x + MARGIN,
+                y = y + stackHeight,
+                width = CONTAINER_WIDTH,
+                height = 1
+            )
+            stackHeight += 1
+
+            val containerInnerHeight = CONTAINER_BUTTON_SIZE * rows + BUTTON_SEPERATION * (rows + 1)
+
+            blitk(
+                context = guiGraphics,
+                texture = containerResource,
+                x = x + MARGIN,
+                y = y + stackHeight,
+                width = CONTAINER_WIDTH,
+                height = containerInnerHeight
+            )
+            stackHeight += containerInnerHeight
+
+            blitk(
+                context = guiGraphics,
+                texture = edgeResource,
+                x = x + MARGIN,
+                y = y + stackHeight,
+                width = CONTAINER_WIDTH,
+                height = 1
+            )
+            stackHeight += 1
+
+            //Footer
+            blitk(
+                context = guiGraphics,
+                texture = footerResource,
+                x = x + MARGIN,
+                y = y + stackHeight,
+                width = CONTAINER_WIDTH,
+                height = 1
+            )
+
+            //Buttons
+            for (index in 0..<itemSize) {
+                val row = index / 3
+                val column = index % 3
+
+                val startX = x + MARGIN + 5 + column * (CONTAINER_BUTTON_SIZE + 2)
+                val startY = y + HEADER_HEIGHT + 1 + BUTTON_SEPERATION + row * (BUTTON_SEPERATION + CONTAINER_BUTTON_SIZE)
+
+                val active = starterSelectionScreen.currentCategory == category && starterSelectionScreen.currentSelection == index
+                val hovered = getEntryAtPosition(mouseX, mouseY) == this && mouseX in startX..(startX + CONTAINER_BUTTON_SIZE) && mouseY in startY..(startY + CONTAINER_BUTTON_SIZE)
+
+                blitk(
+                    context = guiGraphics,
+                    texture = if (active) buttonActiveResource else buttonResource,
+                    x = startX,
+                    y = startY,
+                    width = CONTAINER_BUTTON_SIZE,
+                    height = CONTAINER_BUTTON_SIZE,
+                    textureHeight = CONTAINER_BUTTON_SIZE * 2,
+                    vOffset = if (hovered) CONTAINER_BUTTON_SIZE else 0
+                )
+
+                if (index == category.pokemon.size) {
+                    blitk(
+                        context = guiGraphics,
+                        texture = unknownResource,
+                        x = (startX + 4.5F) / 0.04f,
+                        y = (startY + 3.5F) / 0.04f,
+                        width = 390,
+                        height = 444,
+                        scale = 0.04f
+                    )
+                } else {
+                    matrices.pushMatrix()
+                    matrices.translate((startX + (CONTAINER_BUTTON_SIZE / 2.0)).toFloat(), (startY.toDouble() - 6).toFloat())
+                    matrices.scale(3.5F, 3.5F)
+
+                    val state = FloatingState()
+                    state.currentAspects = category.pokemon[index].aspects
+                    drawProfilePokemon(
+                        species = category.pokemon[index].species.resourceIdentifier,
+                        context = guiGraphics,
+                        rotation = Quaternionf().fromEulerXYZDegrees(Vector3f(13F, 35F, 0F)),
+                        state = state,
+                        scale = 4.5F,
+                        partialTicks = 0F
+                    )
+                    matrices.popMatrix()
+                }
+            }
+        }
+
+        override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
+        val mouseX = event.x()
+        val mouseY = event.y()
+        val button = event.button()
+
+            val entryY = getRowTop(this)
+            val hoveredButton = getButtonHovered(x, entryY, mouseX, mouseY)
+            if (hoveredButton != -1) {
+                starterSelectionScreen.selectPokemon(category, hoveredButton)
+                Minecraft.getInstance().soundManager.play(SimpleSoundInstance.forUI(CobblemonSounds.GUI_CLICK, 1.0F))
+                return true
+            }
+            return false
+        }
+
+        private fun getButtonHovered(x: Int, y: Int, mouseX: Double, mouseY: Double): Int {
+            val itemSize = category.pokemon.size + if (category.randomStarter) 1 else 0
+            for (index in 0..<itemSize) {
+                val row = index / 3
+                val column = index % 3
+
+                val startX = x + MARGIN + 5 + column * (CONTAINER_BUTTON_SIZE + 2)
+                val startY = y + HEADER_HEIGHT + 1 + BUTTON_SEPERATION + row * (BUTTON_SEPERATION + CONTAINER_BUTTON_SIZE)
+
+                if (getEntryAtPosition(mouseX.toInt(), mouseY.toInt()) == this && mouseX.toInt() in startX..(startX + CONTAINER_BUTTON_SIZE) && mouseY.toInt() in startY..(startY + CONTAINER_BUTTON_SIZE)) {
+                    return index
+                }
+            }
+            return -1
+        }
+    }
+}

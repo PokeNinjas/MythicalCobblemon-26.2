@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": "cobblemon:pokerod_smithing_template",
+  "base": "#minecraft:enchantable/fishing",
+  "addition": "cobblemon:ancient_slate_ball",
+  "result": {
+    "id": "cobblemon:ancient_slate_rod",
+    "count": 1
+  }
+}

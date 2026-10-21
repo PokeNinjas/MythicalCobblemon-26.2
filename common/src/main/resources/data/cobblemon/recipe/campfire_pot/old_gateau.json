@@ -1,0 +1,15 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "foods",
+    "ingredients": [
+        "minecraft:potato",
+        "minecraft:beetroot",
+        "minecraft:honey_bottle",
+        "minecraft:sugar"
+    ],
+    "result": {
+        "id": "cobblemon:old_gateau"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

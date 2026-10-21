@@ -1,0 +1,28 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.api.pokedex
+
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.PrimitiveCodec
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.util.StringRepresentable
+
+/**
+ * Contains stats about a specific Pokémon for putting in the PokéDex
+ *
+ * @author JPAK, Apion
+ * @since February 21, 2024
+ */
+enum class PokedexEntryProgress : StringRepresentable, Comparable<PokedexEntryProgress> {
+    UNREGISTERED,
+    SEEN,
+    OWNED;
+
+    override fun getSerializedName() = this.name
+}

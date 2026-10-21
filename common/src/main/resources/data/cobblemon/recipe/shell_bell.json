@@ -1,0 +1,11 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "minecraft:nautilus_shell",
+        "#c:gems/prismarine",
+        "#c:ingots/iron"
+    ],
+    "result": {
+        "id": "cobblemon:shell_bell"
+    }
+}

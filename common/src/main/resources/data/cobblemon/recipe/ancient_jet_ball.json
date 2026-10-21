@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " t ",
+        "lcr",
+        " b "
+    ],
+    "key": {
+        "t": "cobblemon:blue_apricorn",
+        "l": "cobblemon:sky_tumblestone",
+        "c": "#cobblemon:tier_3_poke_ball_materials",
+        "r": "cobblemon:sky_tumblestone",
+        "b": "cobblemon:white_apricorn"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:ancient_jet_ball"
+    }
+}

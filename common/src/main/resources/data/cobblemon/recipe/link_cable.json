@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "  Q",
+        "CPC",
+		"Q  "
+    ],
+    "key": {
+        "Q": "#c:gems/quartz",
+        "C": "#c:ingots/copper",
+        "P": "minecraft:ender_pearl"
+    },
+    "result": {
+        "id": "cobblemon:link_cable"
+    }
+}

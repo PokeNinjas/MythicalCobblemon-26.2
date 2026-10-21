@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " I ",
+        "InI",
+		"INI"
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "n": "#c:nuggets/iron",
+        "N": "minecraft:note_block"
+    },
+    "result": {
+        "id": "cobblemon:metronome"
+    }
+}

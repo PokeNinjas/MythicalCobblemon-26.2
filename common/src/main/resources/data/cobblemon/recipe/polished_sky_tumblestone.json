@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "building",
+    "pattern": [
+        "##",
+        "##"
+    ],
+    "key": {
+        "#": "cobblemon:sky_tumblestone_block"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:polished_sky_tumblestone"
+    }
+}

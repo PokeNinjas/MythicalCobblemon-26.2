@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "PPP",
+        "PCP",
+        "WHW"
+    ],
+    "key": {
+        "P": "#minecraft:planks",
+        "C": "cobblemon:pc",
+        "W": "#c:crops/wheat",
+        "H": "minecraft:hopper"
+    },
+    "result": {
+        "id": "cobblemon:pasture"
+    }
+}

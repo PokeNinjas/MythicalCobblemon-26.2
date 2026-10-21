@@ -1,0 +1,38 @@
+accessWidener v2 official
+
+# Verified 26.2 members already used by the shared renderer.
+transitive-accessible field net/minecraft/client/model/geom/ModelPart children Ljava/util/Map;
+transitive-accessible field net/minecraft/client/model/geom/ModelPart cubes Ljava/util/List;
+transitive-extendable method net/minecraft/world/entity/LivingEntity handleRelativeFrictionAndCalculateMovement (Lnet/minecraft/world/phys/Vec3;F)Lnet/minecraft/world/phys/Vec3;
+transitive-accessible method net/minecraft/server/level/ServerPlayer setShoulderEntityLeft (Lnet/minecraft/nbt/CompoundTag;)V
+transitive-accessible method net/minecraft/server/level/ServerPlayer setShoulderEntityRight (Lnet/minecraft/nbt/CompoundTag;)V
+
+accessible method net/minecraft/server/level/ServerPlayer respawnEntityOnShoulder (Lnet/minecraft/nbt/CompoundTag;)V
+
+# Native arm/attack overlays applied to extracted riding poses.
+accessible method net/minecraft/client/model/HumanoidModel poseRightArm (Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V
+accessible method net/minecraft/client/model/HumanoidModel poseLeftArm (Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V
+accessible method net/minecraft/client/model/HumanoidModel setupAttackAnimation (Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V
+
+# Native cooking recipe-book ghost slots.
+accessible method net/minecraft/client/gui/screens/recipebook/GhostSlots setInput (Lnet/minecraft/world/inventory/Slot;Lnet/minecraft/util/context/ContextMap;Lnet/minecraft/world/item/crafting/display/SlotDisplay;)V
+accessible method net/minecraft/client/gui/screens/recipebook/GhostSlots setResult (Lnet/minecraft/world/inventory/Slot;Lnet/minecraft/util/context/ContextMap;Lnet/minecraft/world/item/crafting/display/SlotDisplay;)V
+
+# Native candle particle and sound behavior for Poke Snacks.
+accessible method net/minecraft/world/level/block/AbstractCandleBlock addParticlesAndSound (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/util/RandomSource;)V
+
+# Preserve vanilla leaf distance calculation during apricorn generation.
+accessible method net/minecraft/world/level/block/LeavesBlock updateDistance (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;
+
+# Preserve the in-process data-sync guard without replacing shared client registries.
+accessible field net/minecraft/server/network/ServerCommonPacketListenerImpl connection Lnet/minecraft/network/Connection;
+
+# The existing biome accessor exposes the native climate record for berry growth.
+accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
+
+# Native nested types used by existing recipe, datafix and structure hooks.
+accessible class net/minecraft/util/datafix/fixes/ItemStackComponentizationFix$ItemStackData
+accessible class net/minecraft/world/inventory/BrewingStandMenu$IngredientsSlot
+accessible class net/minecraft/world/inventory/BrewingStandMenu$PotionSlot
+accessible class net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement$Placer
+accessible field net/minecraft/world/level/levelgen/structure/pools/SinglePoolElement template Lcom/mojang/datafixers/util/Either;

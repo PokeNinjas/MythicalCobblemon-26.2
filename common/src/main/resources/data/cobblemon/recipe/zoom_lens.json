@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "AGG",
+        "GCC",
+        "  C"
+    ],
+    "key": {
+        "G": "#c:ingots/gold",
+        "C": "#c:ingots/copper",
+        "A": "#c:gems/amethyst"
+    },
+    "result": {
+        "id": "cobblemon:zoom_lens"
+    }
+}

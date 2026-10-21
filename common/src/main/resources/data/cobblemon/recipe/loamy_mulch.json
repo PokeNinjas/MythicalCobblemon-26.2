@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "minecraft:dirt",
+        "cobblemon:mulch_base"
+    ],
+    "result": {
+        "id": "cobblemon:loamy_mulch"
+    }
+}

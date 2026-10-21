@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "III",
+        "GRG",
+        "GCG"
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "G": "minecraft:glass",
+        "R": "cobblemon:revive",
+        "C": "minecraft:composter"
+    },
+    "result": {
+        "id": "cobblemon:restoration_tank"
+    }
+}

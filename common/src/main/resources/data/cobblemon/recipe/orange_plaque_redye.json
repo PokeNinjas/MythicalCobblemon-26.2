@@ -1,0 +1,11 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "group": "plaque_redye",
+    "ingredients": [
+        "#cobblemon:plaques",
+        "#c:dyes/orange"
+    ],
+    "result": {
+        "id": "cobblemon:orange_plaque"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "foods",
+    "ingredients": [
+        "minecraft:wheat",
+        "#c:drinks/milk",
+        "minecraft:snowball",
+        "minecraft:sugar"
+    ],
+    "result": {
+        "id": "cobblemon:casteliacone"
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "IGI",
+        "I I",
+        "R B"
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "B": "#c:gems/lapis",
+        "R": "#c:dusts/redstone",
+		"G": "cobblemon:electric_gem"
+    },
+    "result": {
+        "id": "cobblemon:magnet"
+    }
+}

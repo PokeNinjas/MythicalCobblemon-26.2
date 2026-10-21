@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "IDI",
+        "DSD",
+        " A "
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "D": "#c:gems/diamond",
+        "S": "#c:tools/shield",
+        "A": "#c:gems/amethyst"
+    },
+    "result": {
+        "id": "cobblemon:ability_shield"
+    }
+}

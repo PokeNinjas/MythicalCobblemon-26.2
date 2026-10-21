@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " t ",
+        "lcr",
+        " b "
+    ],
+    "key": {
+        "t": "cobblemon:black_apricorn",
+        "l": "cobblemon:yellow_apricorn",
+        "c": "#cobblemon:tier_3_poke_ball_materials",
+        "r": "cobblemon:yellow_apricorn",
+        "b": "cobblemon:black_apricorn"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:ultra_ball"
+    }
+}

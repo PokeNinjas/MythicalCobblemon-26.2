@@ -1,0 +1,19 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "foods",
+    "ingredients": [
+        "minecraft:bowl",
+        "minecraft:beetroot",
+        "minecraft:beetroot",
+        "minecraft:beetroot",
+        "minecraft:beetroot",
+        "minecraft:beetroot",
+        "minecraft:beetroot"
+    ],
+    "result": {
+        "id": "minecraft:beetroot_soup",
+        "count": 1
+    },
+    "seasoningTag": "cobblemon:empty",
+    "seasoningProcessors": []
+}

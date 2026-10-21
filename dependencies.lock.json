@@ -1,0 +1,14 @@
+{
+  "molang": [
+    {
+      "path": "deps/local/com/bedrockk/molang/1.1.20/molang-1.1.20.jar",
+      "sha256": "c25ad69028b1489d985b5c7e3dd3d1d58ae10595e5e78d0b50c0919d9a8068ba",
+      "url": "https://gitlab.com/cable-mc/cobblemon/-/raw/0bd7b4dab32d20b692de0ff5dc6a48450018a77c/deps/local/com/bedrockk/molang/1.1.20/molang-1.1.20.jar"
+    },
+    {
+      "path": "deps/local/com/bedrockk/molang/1.1.20/molang-1.1.20.pom",
+      "sha256": "ec05cae4c4cdaa42b274f7f7dad9d528535734d4e9c3b0d3db55dc415ee37fa0",
+      "url": "https://gitlab.com/cable-mc/cobblemon/-/raw/0bd7b4dab32d20b692de0ff5dc6a48450018a77c/deps/local/com/bedrockk/molang/1.1.20/molang-1.1.20.pom"
+    }
+  ]
+}

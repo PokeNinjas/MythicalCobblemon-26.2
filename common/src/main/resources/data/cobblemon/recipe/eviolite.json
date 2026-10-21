@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " A ",
+        "AEA",
+        " A "
+    ],
+    "key": {
+        "A": "#c:gems/amethyst",
+        "E": "cobblemon:everstone"
+    },
+    "result": {
+        "id": "cobblemon:eviolite"
+    }
+}

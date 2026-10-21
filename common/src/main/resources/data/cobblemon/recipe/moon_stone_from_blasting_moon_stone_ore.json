@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:blasting",
+    "group": "moon_stone",
+    "ingredient": "cobblemon:moon_stone_ore",
+    "result": {
+        "id": "cobblemon:moon_stone"
+    },
+    "experience": 0.2,
+    "cookingtime": 100
+}

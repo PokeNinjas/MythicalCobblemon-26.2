@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ATM",
+        "TET",
+        "MTA"
+    ],
+    "key": {
+        "A": "#c:gems/amethyst",
+        "T": "minecraft:tinted_glass",
+        "E": "minecraft:ender_pearl",
+        "M": "minecraft:phantom_membrane"
+    },
+    "result": {
+        "id": "cobblemon:smoke_ball"
+    }
+}

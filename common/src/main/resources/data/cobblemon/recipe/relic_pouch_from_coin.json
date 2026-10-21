@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "group": "relic_pouch",
+    "key": {
+        "#": "cobblemon:relic_coin"
+    },
+    "pattern": [
+        "###",
+        "###",
+        "###"
+    ],
+    "result": {
+        "id": "cobblemon:relic_coin_pouch"
+    },
+    "show_notification": true
+}

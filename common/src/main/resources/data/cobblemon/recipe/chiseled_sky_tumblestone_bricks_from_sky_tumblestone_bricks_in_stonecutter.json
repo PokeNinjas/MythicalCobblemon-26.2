@@ -1,0 +1,8 @@
+{
+    "type": "minecraft:stonecutting",
+    "ingredient": "cobblemon:sky_tumblestone_bricks",
+    "result": {
+        "id": "cobblemon:chiseled_sky_tumblestone_bricks",
+    "count": 1
+    }
+}

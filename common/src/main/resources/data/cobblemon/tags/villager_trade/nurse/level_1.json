@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "cobblemon:nurse/1/emerald_oran_berry",
+    "cobblemon:nurse/1/emerald_persim_berry",
+    "cobblemon:nurse/1/emerald_energy_root",
+    "cobblemon:nurse/1/medicinal_leek_emerald"
+  ]
+}

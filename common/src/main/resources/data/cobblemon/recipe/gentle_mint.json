@@ -1,0 +1,14 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "key": {
+        "#": "cobblemon:pink_mint_leaf",
+        "W": "cobblemon:blue_mint_leaf"
+    },
+    "pattern": [
+        "##",
+        "#W"
+    ],
+    "result": {
+        "id": "cobblemon:gentle_mint"
+    }
+}

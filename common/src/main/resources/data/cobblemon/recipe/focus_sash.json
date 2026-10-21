@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "D  ",
+        "LIL",
+        "  D"
+    ],
+    "key": {
+        "L": "#c:leathers",
+        "D": "minecraft:blaze_powder",
+        "I": "#c:ingots/copper"
+    },
+    "result": {
+        "id": "cobblemon:focus_sash"
+    }
+}

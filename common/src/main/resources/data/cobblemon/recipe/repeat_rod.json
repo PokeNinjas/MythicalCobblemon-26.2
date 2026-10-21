@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": "cobblemon:pokerod_smithing_template",
+  "base": "#minecraft:enchantable/fishing",
+  "addition": "cobblemon:repeat_ball",
+  "result": {
+    "id": "cobblemon:repeat_rod",
+    "count": 1
+  }
+}

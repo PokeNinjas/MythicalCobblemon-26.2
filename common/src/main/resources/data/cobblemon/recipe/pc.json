@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "IGI",
+        "ICI",
+        "SCS"
+    ],
+    "key": {
+        "G": "minecraft:glass",
+        "I": "#c:ingots/iron",
+        "C": "#c:ingots/copper",
+        "S": "minecraft:smooth_stone"
+    },
+    "result": {
+        "id": "cobblemon:pc"
+    }
+}

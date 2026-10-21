@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "P P",
+        "SCS",
+        " S "
+    ],
+    "key": {
+        "P": "cobblemon:protector",
+        "C": "minecraft:leather_chestplate",
+        "S": "minecraft:armadillo_scute"
+    },
+    "result": {
+        "id": "cobblemon:assault_vest"
+    }
+}

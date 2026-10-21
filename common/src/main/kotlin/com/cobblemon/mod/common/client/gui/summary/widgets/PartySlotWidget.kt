@@ -1,0 +1,282 @@
+/*
+ * Copyright (C) 2023 Cobblemon Contributors
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+package com.cobblemon.mod.common.client.gui.summary.widgets
+
+import net.minecraft.client.input.MouseButtonEvent
+
+import com.cobblemon.mod.common.Cobblemon
+import com.cobblemon.mod.common.CobblemonSounds
+import com.cobblemon.mod.common.api.gui.blitk
+import com.cobblemon.mod.common.client.CobblemonResources
+import com.cobblemon.mod.common.client.gui.PokemonGUIAnimationStyle
+import com.cobblemon.mod.common.client.gui.drawProfilePokemon
+import com.cobblemon.mod.common.client.gui.summary.Summary
+import com.cobblemon.mod.common.client.render.drawScaledText
+import com.cobblemon.mod.common.client.render.getDepletableRedGreen
+import com.cobblemon.mod.common.client.render.models.blockbench.FloatingState
+import com.cobblemon.mod.common.client.render.renderScaledGuiItemIcon
+import com.cobblemon.mod.common.pokemon.Gender
+import com.cobblemon.mod.common.pokemon.Pokemon
+import com.cobblemon.mod.common.util.cobblemonResource
+import com.cobblemon.mod.common.util.lang
+import com.cobblemon.mod.common.util.math.fromEulerXYZDegrees
+import com.cobblemon.mod.common.util.toAssetPath
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
+import org.joml.Quaternionf
+import org.joml.Vector3f
+
+class PartySlotWidget(
+    pX: Number,
+    pY: Number,
+    private val partyWidget: PartyWidget,
+    private val summary: Summary,
+    private val pokemon: Pokemon?,
+    private val index: Int,
+    private val isClientPartyMember: Boolean,
+) : SoundlessWidget(pX.toInt(), pY.toInt(), WIDTH, HEIGHT, Component.literal("PartyMember")) {
+    val state = FloatingState()
+    companion object {
+        const val WIDTH = 46
+        const val HEIGHT = 27
+        private const val PORTRAIT_DIAMETER = 25
+
+        private val slotResource = cobblemonResource("textures/gui/summary/summary_party_slot.png")
+        private val slotFaintedResource = cobblemonResource("textures/gui/summary/summary_party_slot_fainted.png")
+        private val slotEmptyResource = cobblemonResource("textures/gui/summary/summary_party_slot_empty.png")
+        val genderIconMale = cobblemonResource("textures/gui/party/party_gender_male.png")
+        val genderIconFemale = cobblemonResource("textures/gui/party/party_gender_female.png")
+    }
+
+    private fun getSlotTexture(pokemon: Pokemon?): Identifier {
+        if (pokemon != null) {
+            if (pokemon.isFainted()) return slotFaintedResource
+            return slotResource
+        }
+        return slotEmptyResource
+    }
+
+    private fun getSlotVOffset(pokemon: Pokemon?, isHovered: Boolean, isSelected: Boolean): Int {
+        if (isHovered || isSelected) {
+            if (pokemon == null) {
+                if (partyWidget.swapEnabled) return height
+                return 0
+            }
+            return height
+        }
+        return 0
+    }
+
+    override fun extractWidgetRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
+        isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height
+        val matrices = context.pose()
+        val isDraggedSlot = partyWidget.swapEnabled && partyWidget.swapSource == index
+        val slotPokemon = if (isDraggedSlot) null else pokemon
+        val isSelected = this.isClientPartyMember && this.summary.selectedPokemon.uuid == slotPokemon?.uuid
+
+        state.currentAspects = slotPokemon?.aspects ?: emptySet()
+
+        blitk(
+            context = context,
+            texture = getSlotTexture(slotPokemon),
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+            vOffset = getSlotVOffset(slotPokemon, isHovered, isSelected),
+            textureHeight = height * 2,
+        )
+
+        if (slotPokemon != null) {
+            val halfScale = 0.5F
+
+            val stateIcon = slotPokemon.state.getIcon(slotPokemon)
+            if (stateIcon != null) {
+                blitk(
+                    context = context,
+                    texture = stateIcon,
+                    x = (x + 24.5) / halfScale,
+                    y = (y + 3) / halfScale,
+                    height = 17,
+                    width = 24,
+                    scale = halfScale
+                )
+            }
+
+            val ballIcon = slotPokemon.caughtBall.name.toAssetPath("textures/gui/ball/", ".png")
+            val ballHeight = 22
+            blitk(
+                context = context,
+                texture = ballIcon,
+                x = (x - 2) / halfScale,
+                y = (y - 3) / halfScale,
+                height = ballHeight,
+                width = 18,
+                textureHeight = ballHeight * 2,
+                scale = halfScale
+            )
+
+            val status = slotPokemon.status?.status
+            if (!slotPokemon.isFainted() && status != null) {
+                val statusName = status.showdownName
+                    blitk(
+                    context = context,
+                    texture = cobblemonResource("textures/gui/party/status_$statusName.png"),
+                    x = x + 42,
+                    y = y + 5,
+                    height = 14,
+                    width = 4
+                )
+            }
+
+            val hpRatio = slotPokemon.currentHealth / slotPokemon.maxHealth.toFloat()
+            val barWidthMax = 37
+            val barWidth = hpRatio * barWidthMax
+            val (red, green) = getDepletableRedGreen(hpRatio)
+
+            blitk(
+                context = context,
+                texture = CobblemonResources.WHITE,
+                x = x + 4,
+                y = y + 25,
+                width = barWidth,
+                height = 1,
+                textureWidth = barWidth / hpRatio,
+                uOffset = barWidthMax - barWidth,
+                red = red * 0.8F,
+                green = green * 0.8F,
+                blue = 0.27F
+            )
+
+            // Render Pokémon
+            matrices.pushMatrix()
+            matrices.translate((x + (PORTRAIT_DIAMETER / 2.0)).toFloat(), (y - 3.0).toFloat())
+            matrices.scale(2.5F, 2.5F)
+
+            val shouldAnimate = when (Cobblemon.config.summaryProfileAnimations) {
+                PokemonGUIAnimationStyle.ALWAYS_ANIMATE -> true
+                PokemonGUIAnimationStyle.NEVER_ANIMATE -> false
+                PokemonGUIAnimationStyle.ANIMATE_SELECTED -> isHovered || isSelected
+            }
+
+            drawProfilePokemon(
+                species = slotPokemon.species.resourceIdentifier,
+                context = context,
+                rotation = Quaternionf().fromEulerXYZDegrees(Vector3f(13F, 35F, 0F)),
+                state = state,
+                scale = 4.5F,
+                partialTicks = if (shouldAnimate) delta else 0F
+            )
+            matrices.popMatrix()
+
+            drawScaledText(
+                context = context,
+                text = slotPokemon.getDisplayName(),
+                x = x + 4,
+                y = y + 20,
+                scale = halfScale
+            )
+
+            if (slotPokemon.gender != Gender.GENDERLESS) {
+                blitk(
+                    context = context,
+                    texture = if (slotPokemon.gender == Gender.MALE) genderIconMale else genderIconFemale,
+                    x = (x + 40) / halfScale,
+                    y = (y + 20) / halfScale,
+                    height = 7,
+                    width = 5,
+                    scale = halfScale
+                )
+            }
+
+            drawScaledText(
+                context = context,
+                text = lang("ui.lv.number", slotPokemon.level),
+                x = x + 31,
+                y = y + 13,
+                centered = true,
+                shadow = true,
+                scale = halfScale
+            )
+
+            // Held Item
+            val heldItem = slotPokemon.heldItemNoCopy()
+            if (!heldItem.isEmpty) {
+                renderScaledGuiItemIcon(
+                        context = context,
+                    itemStack = heldItem,
+                    x = x + 14.0,
+                    y = y + 9.5,
+                    scale = 0.5)
+            }
+        }
+    }
+
+    override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
+        val pMouseX = event.x()
+        val pMouseY = event.y()
+        val pButton = event.button()
+
+        if (isValidClick(pMouseX, pMouseY, pButton)) {
+            if (partyWidget.swapEnabled) {
+                toggleDrag(true)
+            } else {
+                if ((index > -1) && (summary.selectedPokemon.uuid != pokemon?.uuid)) {
+                    summary.switchSelection(index)
+                    if (pokemon != null) partyWidget.playSound(CobblemonSounds.GUI_CLICK)
+                    return true
+                }
+            }
+        }
+        return super.mouseClicked(event, doubleClick)
+    }
+
+    override fun mouseReleased(event: MouseButtonEvent): Boolean {
+        val pMouseX = event.x()
+        val pMouseY = event.y()
+        val pButton = event.button()
+
+        if (partyWidget.swapEnabled) toggleDrag(false)
+        return partyWidget.mouseReleased(event)
+    }
+
+    override fun mouseDragged(event: MouseButtonEvent, dragX: Double, dragY: Double): Boolean {
+        val mouseX = event.x()
+        val mouseY = event.y()
+        val button = event.button()
+        val f = dragX
+        val g = dragY
+
+        if (partyWidget.swapEnabled && partyWidget.isWithinScreen(mouseX, mouseY) && index < 0) {
+            repositionSlot(mouseX, mouseY)
+        } else {
+            if (partyWidget.swapSource != null) partyWidget.playSound(CobblemonSounds.PC_DROP)
+            toggleDrag(false)
+            partyWidget.swapSource = null
+            partyWidget.draggedSlot = null
+        }
+        return super.mouseDragged(event, f, g)
+    }
+
+    private fun toggleDrag(boolean: Boolean) {
+        val focusedElement = if (boolean) partyWidget.draggedSlot else null
+        summary.focused = focusedElement
+        summary.isDragging = boolean
+    }
+
+    private fun repositionSlot(mouseX: Double, mouseY: Double) {
+        x = (mouseX - (WIDTH / 2)).toInt()
+        y = (mouseY - (HEIGHT / 2)).toInt()
+    }
+
+    private fun isValidClick(mouseX: Double, mouseY: Double, button: Int): Boolean = button == 0
+        && mouseX.toInt() in x..(x + width)
+        && mouseY.toInt() in y..(y + height)
+}

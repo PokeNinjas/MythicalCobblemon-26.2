@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " t ",
+        "lcr",
+        " b "
+    ],
+    "key": {
+        "t": "cobblemon:red_apricorn",
+        "l": "cobblemon:tumblestone",
+        "c": "#cobblemon:tier_2_poke_ball_materials",
+        "r": "cobblemon:tumblestone",
+        "b": "cobblemon:blue_apricorn"
+    },
+    "result": {
+        "count": 4,
+        "id": "cobblemon:ancient_great_ball"
+    }
+}

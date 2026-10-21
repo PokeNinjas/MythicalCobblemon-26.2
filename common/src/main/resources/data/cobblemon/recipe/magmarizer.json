@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "CIC",
+        "IMI",
+        "CIC"
+    ],
+    "key": {
+        "M": "minecraft:magma_block",
+        "I": "#c:ingots/iron",
+        "C": "#c:ingots/copper"
+    },
+    "result": {
+        "id": "cobblemon:magmarizer"
+    }
+}

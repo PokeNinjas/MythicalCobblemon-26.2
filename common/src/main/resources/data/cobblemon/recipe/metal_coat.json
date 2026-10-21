@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "III",
+        "CGH",
+        "III"
+    ],
+    "key": {
+        "I": "#c:ingots/iron",
+        "C": "minecraft:clay_ball",
+        "H": "minecraft:honeycomb",
+        "G": "cobblemon:steel_gem"
+    },
+    "result": {
+        "id": "cobblemon:metal_coat"
+    }
+}

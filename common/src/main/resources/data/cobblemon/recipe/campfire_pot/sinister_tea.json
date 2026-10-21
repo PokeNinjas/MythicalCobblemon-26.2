@@ -1,0 +1,27 @@
+{
+    "type": "cobblemon:cooking_pot_shapeless",
+    "category": "complex_dishes",
+    "group": "sinister_tea",
+    "ingredients": [
+        "minecraft:bowl",
+        "minecraft:bowl",
+        "minecraft:bowl",
+        {
+            "fabric:type": "fabric:any",
+            "ingredients": [
+                "minecraft:water_bucket",
+                "#c:drinks/milk"
+            ]
+        }
+    ],
+    "result": {
+        "id": "cobblemon:sinister_tea",
+        "count": 3
+    },
+    "seasoningTag": "cobblemon:recipe_filters/tea_seasoning",
+    "seasoningProcessors": [
+        "ingredient",
+        "food_colour",
+        "mob_effects"
+    ]
+}
